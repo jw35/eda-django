@@ -1,3 +1,5 @@
+import os
+
 from eda.settings import *
 
 from eda.production_secrets import *
