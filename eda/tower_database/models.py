@@ -1,6 +1,8 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.utils.html import escape
+from django.utils.safestring import mark_safe
 
 from multiselectfield import MultiSelectField
 from simple_history.models import HistoricalRecords
@@ -265,6 +267,24 @@ class Website(models.Model):
 
     class Meta:
         ordering = ["website"]
+
+
+class Photo(models.Model):
+
+    tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
+    photo = models.ImageField(blank=True, upload_to="eda/tower/photo", height_field="photo_height", width_field="photo_width")
+    photo_height = models.SmallIntegerField(blank=True, null=True, editable=False)
+    photo_width = models.SmallIntegerField(blank=True, null=True, editable=False)
+
+    def __str__(self):
+        return f'Photo of {self.tower} ({self.photo_height}x{self.photo_width})'
+
+    def photo_tag(self):
+        return mark_safe(f'<img src="{escape(self.photo.url)}" height="{min(self.photo.height, 200)}">')
+    photo_tag.short_description = 'Image'
+
+    class Meta:
+        ordering = ["tower"]
 
 
 class ContactMap(models.Model):

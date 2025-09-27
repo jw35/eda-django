@@ -17,12 +17,17 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.conf import settings
 from django.views.generic import TemplateView
-from django.urls import path
+from django.views.static import serve
+from django.urls import path, re_path
+
 
 urlpatterns = [
 
     path(r'', TemplateView.as_view(template_name="eda/index.html"), name='index'),
+
+    re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
 
     # Admin site password change support
     # https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#adding-a-password-reset-feature

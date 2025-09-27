@@ -8,3 +8,4 @@ backups/
 backup_params
 .coverage
 eda/static
+eda/media

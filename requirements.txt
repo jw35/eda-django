@@ -7,6 +7,7 @@ django-search-admin-autocomplete==0.2.1
 django-simple-history==3.10.1
 django-use-email-as-username==1.4.0
 idna==3.10
+pillow==11.3.0
 requests==2.32.5
 sqlparse==0.5.3
 Unidecode==1.4.0

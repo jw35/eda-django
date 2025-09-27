@@ -1,5 +1,5 @@
 from django.contrib import admin
-from django.utils.html import urlize
+from django.utils.html import urlize, escape
 from django.utils.safestring import mark_safe
 
 from search_admin_autocomplete.admin import SearchAutoCompleteAdmin
@@ -8,11 +8,14 @@ from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 
-from .models import Contact, Tower, ContactMap, Website, DoveTower
+from .models import Contact, Tower, ContactMap, Photo, Website, DoveTower
 
 admin.site.site_header = "Ely DA Admin"
 admin.site.site_title = "Database admin"
 admin.site.index_title = "Database admin"
+
+
+
 
 
 class ContactInline(admin.TabularInline):
@@ -42,13 +45,25 @@ class WebsiteInline(admin.TabularInline):
     extra = 0
     #classes = ["collapse"]
 
+class PhotoInline(admin.StackedInline):
+    model = Photo
+    fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
+    readonly_fields = ["tower", "photo_tag", "photo_height", "photo_width"]
+    extra = 0
+    #classes = ["collapse"]
+
+class PhotoAdmin(SimpleHistoryAdmin):
+    fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
+    readonly_fields = ["tower", "photo_tag", "photo_height", "photo_width"]
+
+
 class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     inlines= [PrimaryContactInline, TowerInline]
     search_fields = ["name", "phone", "email"]
     search_help_text = "Search by name, phone number or email"
 
 class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    inlines = [WebsiteInline, ContactInline]
+    inlines = [WebsiteInline, ContactInline, PhotoInline]
     list_display = ["__str__", "district", "bells"]
     list_filter = ["district", "report", "bells", "ringing_status", "ring_type", "practice_day"]
     search_fields = ["place", "dedication", "full_dedication", "nickname"]
@@ -63,6 +78,8 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 
     def felstead_link_html(self, instance):
         return mark_safe(urlize(instance.felstead_link, nofollow=True, autoescape=True))
+
+
 
     fieldsets = [
         (
@@ -150,3 +167,4 @@ class DoveTowerAdmin(SearchAutoCompleteAdmin):
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Tower, TowerAdmin)
 admin.site.register(DoveTower, DoveTowerAdmin)
+admin.site.register(Photo, PhotoAdmin)
