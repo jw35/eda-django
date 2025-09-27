@@ -277,7 +277,7 @@ class Photo(models.Model):
     photo_width = models.SmallIntegerField(blank=True, null=True, editable=False)
 
     def __str__(self):
-        return f'Photo of {self.tower} ({self.photo_height}x{self.photo_width})'
+        return f'{self.tower} ({self.photo_height}x{self.photo_width})'
 
     def photo_tag(self):
         return mark_safe(f'<img src="{escape(self.photo.url)}" height="{min(self.photo.height, 200)}">')

@@ -79,8 +79,6 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     def felstead_link_html(self, instance):
         return mark_safe(urlize(instance.felstead_link, nofollow=True, autoescape=True))
 
-
-
     fieldsets = [
         (
             None, {
