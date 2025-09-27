@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'custom_user.apps.CustomUserConfig',
     'multiselectfield',
     'simple_history',
+    'eda',
     'tower_database'
 ]
 

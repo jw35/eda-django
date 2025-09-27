@@ -17,9 +17,12 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 from django.urls import path
 
 urlpatterns = [
+
+    path(r'', TemplateView.as_view(template_name="eda/index.html"), name='index'),
 
     # Admin site password change support
     # https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#adding-a-password-reset-feature
