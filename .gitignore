@@ -7,3 +7,4 @@ logs/
 backups/
 backup_params
 .coverage
+eda/static
