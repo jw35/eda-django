@@ -1,0 +1,13 @@
+asgiref==3.9.1
+certifi==2025.8.3
+charset-normalizer==3.4.3
+Django==5.2.6
+django-multiselectfield==1.0.1
+django-search-admin-autocomplete==0.2.1
+django-simple-history==3.10.1
+django-use-email-as-username==1.4.0
+idna==3.10
+requests==2.32.5
+sqlparse==0.5.3
+Unidecode==1.4.0
+urllib3==2.5.0

@@ -1,0 +1,20 @@
+--- venv/lib/python3.11/site-packages/search_admin_autocomplete/admin.py.orig	2025-09-27 11:16:52.000000000 +0100
++++ venv/lib/python3.11/site-packages/search_admin_autocomplete/admin.py	2025-09-27 11:33:12.000000000 +0100
+@@ -2,7 +2,7 @@
+ from operator import or_
+ from typing import List
+ 
+-from django.conf.urls import url
++from django.urls import include, re_path
+ from django.contrib import admin
+ from django.db.models import Q, Model
+ from django.http import HttpRequest
+@@ -35,7 +35,7 @@
+ 
+     def get_urls(self) -> List[URLPattern]:
+         urls = super(SearchAutoCompleteAdmin, self).get_urls()
+-        api_urls = [url(r'^search/(?P<search_term>\w{0,50})$', self.search_api)]
++        api_urls = [re_path(r'^search/(?P<search_term>\w{0,50})$', self.search_api)]
+         return api_urls + urls
+ 
+     def search_api(self, request: HttpRequest, search_term: str) -> HttpResponse:

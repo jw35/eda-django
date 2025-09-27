@@ -1,0 +1,21 @@
+Dove:
+
+wget -O dove.csv "https://dove.cccbr.org.uk/towers.csv"
+
+
+$  /usr/local/opt/sqlite/bin/sqlite3 database
+sqlite> .mode csv
+sqlite> drop table if exists DoveTowers
+sqlite> .import dove.csv dove
+sqlite> .mode box
+
+
+search_admin_autocomplete:
+
+https://github.com/linevych/django-search-admin-autocomplete/issues/15
+
+In venv/lib/pythonx.yy/site-packages/search_admion_autocomplete/admin.py
+
+Replace "from django.conf.urls import url" with "from django.urls import include, re_path"
+
+Replace "api_urls = [url(r'^search/" with "api_urls = [re_path(r'^search/"
