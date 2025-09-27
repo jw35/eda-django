@@ -272,7 +272,7 @@ class Website(models.Model):
 class Photo(models.Model):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
-    photo = models.ImageField(blank=True, upload_to="eda/tower/photo", height_field="photo_height", width_field="photo_width")
+    photo = models.ImageField(blank=True, upload_to="tower_database/photo/photo", height_field="photo_height", width_field="photo_width")
     photo_height = models.SmallIntegerField(blank=True, null=True, editable=False)
     photo_width = models.SmallIntegerField(blank=True, null=True, editable=False)
 
