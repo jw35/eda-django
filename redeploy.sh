@@ -4,7 +4,7 @@
 
 git pull
 
-pip install -r production-requirements.txt
+pip install -r requirements.txt
 
 cd eda
 
