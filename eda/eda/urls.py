@@ -1,5 +1,6 @@
+
 """
-URL configuration for eda project.
+URL configuration for tower_database project.
 
 The `urlpatterns` list routes URLs to views. For more information please see:
     https://docs.djangoproject.com/en/5.2/topics/http/urls/
@@ -15,8 +16,42 @@ Including another URLconf
     2. Add a URL to urlpatterns:  path('blog/', include('blog.urls'))
 """
 from django.contrib import admin
+from django.contrib.auth import views as auth_views
 from django.urls import path
 
 urlpatterns = [
+
+    # Admin site password change support
+    # https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#adding-a-password-reset-feature
+    path(
+        "admin/password_reset/",
+        auth_views.PasswordResetView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
+        name="admin_password_reset",
+    ),
+    path(
+        "admin/password_reset/done/",
+        auth_views.PasswordResetDoneView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
+        name="password_reset_done",
+    ),
+    path(
+        "reset/<uidb64>/<token>/",
+        auth_views.PasswordResetConfirmView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
+        name="password_reset_confirm",
+    ),
+    path(
+        "reset/done/",
+        auth_views.PasswordResetCompleteView.as_view(
+            extra_context={"site_header": admin.site.site_header}
+        ),
+        name="password_reset_complete",
+    ),
+
     path('admin/', admin.site.urls),
+
 ]
