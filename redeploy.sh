@@ -1,6 +1,6 @@
 #!/bin/bash -xe
 
-workon eda-django
+. ~/.virtualenvs/eda-django/bin/activate
 
 git pull
 
