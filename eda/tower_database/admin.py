@@ -59,7 +59,7 @@ class PhotoAdmin(SimpleHistoryAdmin):
 
 class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     inlines= [PrimaryContactInline, TowerInline]
-    search_fields = ["name", "phone", "email"]
+    search_fields = ["name", "phone", "phone2", "email"]
     search_help_text = "Search by name, phone number or email"
 
 class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):

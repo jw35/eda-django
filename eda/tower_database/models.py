@@ -18,17 +18,18 @@ class Contact(models.Model):
     phone = models.CharField(max_length=100, blank=True, help_text="Contact phone number")
     phone2 = models.CharField(max_length=100, blank=True, verbose_name="Phone", help_text="Alternate phone number")
     email = models.EmailField(max_length=100, blank=True, help_text="Contact email address")
+    form = models.URLField(blank=True, help_text="Link to a contact form")
     history = HistoricalRecords()
 
     def __str__(self):
-        return ' / '.join([f for f in (self.name, self.phone, self.phone2, self.email) if f != ''])
+        return ' / '.join([f for f in (self.name, self.phone, self.phone2, self.email, self.form) if f != ''])
 
     class Meta:
         ordering = ["name", "email"]
-        unique_together = "name", "phone", "phone2", "email"
+        unique_together = "name", "phone", "phone2", "email", "form"
         constraints = [
             models.CheckConstraint(
-                condition=~Q(name='') | ~Q(phone = '') | ~Q(phone2 = '') | ~Q(email=''),
+                condition=~Q(name='') | ~Q(phone='') | ~Q(phone2='') | ~Q(email='') | ~Q(form=''),
                 name="no_non_blank_contacts",
                 violation_error_message="Contacts can't be entirely blank"
             ),
