@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.forms import ModelForm
 from django.utils.html import urlize, escape
 from django.utils.safestring import mark_safe
 
@@ -10,12 +11,11 @@ from simple_history.admin import SimpleHistoryAdmin
 
 from .models import Contact, Tower, ContactMap, Photo, Website, DoveTower
 
+from position_widget.widgets import PositionInput
+
 admin.site.site_header = "Ely DA Admin"
 admin.site.site_title = "Database admin"
 admin.site.index_title = "Database admin"
-
-
-
 
 
 class ContactInline(admin.TabularInline):
@@ -62,7 +62,16 @@ class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     search_fields = ["name", "phone", "phone2", "email"]
     search_help_text = "Search by name, phone number or email"
 
+class MyTowerAdminForm(ModelForm):
+    class Meta:
+        model = Tower
+        widgets = {
+            'postcode': PositionInput
+        }
+        fields = '__all__' # required for Django 3.x
+
 class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
+    form = MyTowerAdminForm
     inlines = [WebsiteInline, ContactInline, PhotoInline]
     list_display = ["__str__", "district", "bells"]
     list_filter = ["district", "report", "bells", "ringing_status", "ring_type", "practice_day"]
