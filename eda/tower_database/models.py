@@ -183,6 +183,7 @@ class Tower(models.Model):
     postcode = models.CharField(max_length=10, blank=True, validators=[postcode_validator])
     lat = models.DecimalField(max_digits=5, blank=True, null=True, decimal_places=3)
     lng = models.DecimalField(max_digits=5, blank=True, null=True, decimal_places=3)
+    position = models.CharField(max_length=20, blank=True)
     primary_contact = models.ForeignKey(Contact, blank=True, null=True, on_delete=models.PROTECT, related_name="tower_primary_set")
     contact_use = models.CharField(max_length=10, choices=ContactUses, default='All', help_text="Intended use of contact details")
     other_contacts = models.ManyToManyField(Contact, through="ContactMap", related_name="tower_oher_set")
