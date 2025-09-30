@@ -66,7 +66,7 @@ class MyTowerAdminForm(ModelForm):
     class Meta:
         model = Tower
         widgets = {
-            'postcode': PositionInput
+            'position': PositionInput(height=300)
         }
         fields = '__all__' # required for Django 3.x
 
@@ -134,6 +134,7 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
                     "postcode",
                     "lat",
                     "lng",
+                    "position",
                 )
             }
         ),

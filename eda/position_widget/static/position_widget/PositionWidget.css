@@ -1,1 +1,5 @@
 /* position_widget.css */
+
+.position_widget_map_container {
+	border: 1px solid black;
+}

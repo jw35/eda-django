@@ -45,7 +45,8 @@ INSTALLED_APPS = [
     'multiselectfield',
     'simple_history',
     'eda',
-    'tower_database'
+    'tower_database',
+    'position_widget',
 ]
 
 AUTH_USER_MODEL = 'custom_user.User'
