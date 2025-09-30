@@ -7,6 +7,6 @@ class PositionInput(Textarea):
 
     class Media:
         css = {
-            'all': ['postiton_widget.css'],
+            'all': ['PostitonWidget.css'],
         }
-        js = ['position_widget.js']
+        js = ['PositionWidget.js']
