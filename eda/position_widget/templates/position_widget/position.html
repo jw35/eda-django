@@ -4,6 +4,6 @@
 	{{ widget.value|stringformat:'s' }}, {{ widget.lat1 }}, {{ widget.lng1 }}, {{ widget.lat2 }}, {{ widget.lng2 }}, {{ widget.zoom }}
   </div>
   <script>
-	django.jQuery(document).ready(init_position_widget("{{ widget.name }}", {{ widget.lat1 }}, {{ widget.lng1 }}, {{ widget.lat2 }}, {{ widget.lng2 }}, {{ widget.zoom }}))
+	django.jQuery(document).ready(init_position_widget("{{ widget.name }}", {{ widget.lat1 }}, {{ widget.lng1 }}, {{ widget.lat2 }}, {{ widget.lng2 }}, {{ widget.zoom }}, {{ widget.static_url }}))
   </script>
 </div>

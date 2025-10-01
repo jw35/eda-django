@@ -111,6 +111,8 @@ class Command(BaseCommand):
             else:
                 db_row.contact_use = 'None'
 
+            db_row.position = f"{ csv_row['Lat'] },{ csv_row['Lng'] }"
+
             db_row.save()
 
             if csv_row['Website']:

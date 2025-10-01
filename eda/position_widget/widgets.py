@@ -1,5 +1,6 @@
 # position_widget.py
 
+from django.conf import settings
 from  django.forms.widgets import Input, Script
 
 class PositionInput(Input):
@@ -30,6 +31,7 @@ class PositionInput(Input):
         context["widget"]["lat2"] = self.lat2
         context["widget"]["lng2"] = self.lng2
         context["widget"]["zoom"] = self.zoom
+        context["widget"]["static_url"] = settings.STATIC_URL
         return context
 
     class Media:
