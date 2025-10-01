@@ -66,8 +66,7 @@ class MyTowerAdminForm(ModelForm):
     class Meta:
         model = Tower
         widgets = {
-            #'position': PositionInput(height=300, lat1=52.75959, lng1=-0.46869, lat2=52.07286, lng2=0.58795)
-            'position': PositionInput()
+            'position': PositionInput(height=300, lat1=52.75959, lng1=-0.46869, lat2=52.07286, lng2=0.58795)
         }
         fields = '__all__' # required for Django 3.x
 
