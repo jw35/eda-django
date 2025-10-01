@@ -8,8 +8,8 @@ class PositionInput(Input):
 
     def __init__(
             self, height=200, width=300, 
-            lat1=52.75959, lng1=-0.46869, lat2=52.07286, lng2=0.58795,
-            zoom=5,
+            lat1=58.82368, lng1=-10.48650, lat2=50.16105, lng2=2.45950,
+            zoom=17,
             attrs=None):
         self.height =height
         self.width = width
