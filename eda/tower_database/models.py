@@ -11,6 +11,8 @@ import re
 
 from collections import defaultdict
 
+
+
 # Create your models here.
 
 class Contact(models.Model):
@@ -181,8 +183,8 @@ class Tower(models.Model):
     gf = models.BooleanField(blank=True, null=True, verbose_name="Ground Floor?")
     os_grid= models.CharField(max_length=8, blank=True, validators=[grid_validator], verbose_name='OS Grid')
     postcode = models.CharField(max_length=10, blank=True, validators=[postcode_validator])
-    lat = models.DecimalField(max_digits=5, blank=True, null=True, decimal_places=3)
-    lng = models.DecimalField(max_digits=5, blank=True, null=True, decimal_places=3)
+    lat = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
+    lng = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
     position = models.CharField(max_length=20, blank=True)
     primary_contact = models.ForeignKey(Contact, blank=True, null=True, on_delete=models.PROTECT, related_name="tower_primary_set")
     contact_use = models.CharField(max_length=10, choices=ContactUses, default='All', help_text="Intended use of contact details")

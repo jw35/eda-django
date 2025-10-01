@@ -1,0 +1,9 @@
+<div id="{{ widget.name }}_container">
+  <input type="{{ widget.type }}" name="{{ widget.name }}"{% if widget.value != None %} value="{{ widget.value|stringformat:'s' }}"{% endif %}{% include "django/forms/widgets/attrs.html" %}>
+  <div id="{{ widget.name }}_map" class="position_widget_map_container" style="height: {{ widget.height }}px; width: {{ widget.width }}px">
+	{{ widget.value|stringformat:'s' }}, {{ widget.lat1 }}, {{ widget.lng1 }}, {{ widget.lat2 }}, {{ widget.lng2 }}, {{ widget.zoom }}
+  </div>
+  <script>
+	django.jQuery(document).ready(init_position_widget("{{ widget.name }}", {{ widget.lat1 }}, {{ widget.lng1 }}, {{ widget.lat2 }}, {{ widget.lng2 }}, {{ widget.zoom }}, {{ widget.static_url }}))
+  </script>
+</div>
