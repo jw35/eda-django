@@ -1,0 +1,15 @@
+{% extends 'eda/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h1>All towers</h1>
+
+<ul>
+	{% for tower in towers %}
+	<li><a href="{% url 'tower' tower.id %}">{{ tower }}</a></li>
+	{% endfor %}
+</ul>
+
+{% endblock %}

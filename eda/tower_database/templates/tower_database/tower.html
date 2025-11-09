@@ -1,0 +1,130 @@
+{% extends 'eda/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h1>{{ tower.place }} {{ tower.dedication }}</h1>
+
+<table>
+
+	<tr>
+		<td>County</td>
+		<td>{{ tower.get_county_display }}</td>
+	</tr>
+	{% if tower.fulldedication %}
+	<tr>
+		<td>Full Dedication</td>
+		<td>{{ tower.full_dedication }}</td>
+	</tr>
+	{% endif %}
+    {% if tower.nickname %}
+	<tr>
+		<td>Nickname</td>
+		<td>{{ tower.nickname }}</td>
+	</tr>
+	{% endif %}
+	<tr>
+		<td>District</td>
+		<td>{{ tower.get_district_display }}</td>
+	</tr>
+	<tr>
+		<td>In the Annual Report</td>
+		<td>{{ tower.report|yesno }}</td>
+	</tr>
+	<tr>
+		<td>Ringing Status</td>
+		<td>{{ tower.get_ringing_status_display }}</td>
+	</tr>
+	<tr>
+		<td>Service ringing:</td>
+		<td>{{ tower.service }}</td>
+	</tr>
+	<tr>
+		<td>Practice ringing</td>
+		<td>{{ tower.practice }}</td>
+	</tr>
+	<tr>
+		<td>Number of bells</td>
+		<td>{{ tower.bells }}</td>
+	</tr>
+	<tr>
+		<td>Type of ring</td>
+		<td>{{ tower.get_ring_type_display }}</td>
+	</tr>
+	<tr>
+		<td>Weight</td>
+		<td>{{ tower.weight }}</td>
+	</tr>
+	<tr>
+		<td>Note</td>
+		<td>{{ tower.note }}</td>
+	</tr>
+	<tr>
+		<td>Ground floor?</td>
+		<td>{{ tower.gf|yesno }}</td>
+	</tr>
+	<tr>
+		<td>OS Grid</td>
+		<td>{{ tower.os_grid }}</td>
+	</tr>
+	<tr>
+		<td>PostCode</td>
+		<td>{{ tower.postcode }}</td>
+	</tr>
+	<tr>
+		<td>Latitide, Longitude</td>
+		<td>{{ tower.lat }}, {{ tower.lng }}</td>
+	</tr>
+	<tr>
+		<td>Primary Contact</td>
+		<td>{{ tower.primary_contct }}</td>
+	</tr>
+	<tr>
+		<td>Contact use</td>
+		<td>{{ tower.get_contact_use_display }}</td>
+	</tr>
+	<tr>
+		<td>Other contacts</td>
+	    {% for other in tower.other_contacts.all %}
+		<td>{{ other.contact }}</td>
+		{% endfor %}
+	</tr>
+    <tr>
+    	<td>Websites</td>
+    	{% for website in tower.website_set.all %}
+    	<td><a href="{{ website.website }}">{{ website.website }} </a></td>
+    	{% endfor %}
+    </tr>
+	<tr>
+		<td>Peals</td>
+		<td>{{ tower.peals }}</td>
+	</tr>
+	<tr>
+		<td>Dove TowerID & RingID</td>
+		<td>{{ tower.dove_towerid }} (<a href="{{ tower.dove_link }}">Dove</a>, <a href="{{ tower.bellboard_link }}">BellBoard</a>) {{ tower.dove_ringid }}</td>
+	</tr>
+	<tr>
+		<td>Towerbase ID</td>
+		<td>{{ tower.towerbase_ID }} (<a href="{{ tower.felstead_link }}">Felsted</a>)</td>
+	</tr>
+	<tr>
+		<td>Notes</td>
+		<td>{{ tower.notes }}</td>
+	</tr>
+    <tr>
+		<td>Longer notes</td>
+		<td>{{ tower.long_notes }}</td>
+	</tr>
+
+</table>
+
+{% for photo in tower.photo_set.all %}
+<p>{{ photo.photo_tag }}</p>
+{% endfor %}
+
+<p>{{ tower.history }}</p>
+
+</body>
+
+{% endblock %}
