@@ -17,17 +17,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.contrib.auth import views as auth_views
+from django.contrib.staticfiles.storage import staticfiles_storage
 from django.conf import settings
-from django.views.generic import TemplateView
+from django.views.generic import TemplateView, RedirectView
 from django.views.static import serve
-from django.urls import path, re_path
+from django.urls import path, re_path, include
 
 
 urlpatterns = [
 
     path(r'', TemplateView.as_view(template_name="eda/index.html"), name='index'),
+    path(r'robots.txt', TemplateView.as_view(template_name="eda/robots.txt", content_type='text/plain'), name='index'),
+    path(r'favicon.ico', RedirectView.as_view(url=staticfiles_storage.url("eda/favicon.ico"))),
 
     re_path(r'^media/(?P<path>.*)$', serve,{'document_root': settings.MEDIA_ROOT}), 
+
+    path("towers/", include('tower_database.urls')),
 
     # Admin site password change support
     # https://docs.djangoproject.com/en/5.2/ref/contrib/admin/#adding-a-password-reset-feature
