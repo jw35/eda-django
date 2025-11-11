@@ -1,6 +1,7 @@
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
+from django.urls import reverse
 from django.utils.html import escape
 from django.utils.safestring import mark_safe
 
@@ -25,6 +26,22 @@ class Contact(models.Model):
 
     def __str__(self):
         return ' / '.join([f for f in (self.name, self.phone, self.phone2, self.email, self.form) if f != ''])
+
+    @property
+    def as_links(self):
+        fragments = []
+        if self.name:
+            fragments.append(self.name)
+        if self.phone:
+            fragments.append(self.phone)
+        if self.phone2:
+            fragments.append(self.phone2)
+        if self.email:
+            fragments.append(f'<a href="mailto:{self.email}">{self.email}</a>')
+        if self.form:
+            fragments.append(f'<a href="{self.form}">Contact form</a>')
+        return mark_safe(' / '.join(fragments))
+
 
     class Meta:
         ordering = ["name", "email"]
@@ -201,6 +218,9 @@ class Tower(models.Model):
     def __str__(self):
         return f'{self.place}  ({self.dedication})'
 
+    def get_absolute_url(self):
+        return reverse("tower_detail", kwargs={"pk": self.pk})
+
     @property
     def dove_link(self):
         return f"https://dove.cccbr.org.uk/tower/{self.dove_towerid}"
@@ -295,7 +315,7 @@ class ContactMap(models.Model):
 
     class Roles(models.TextChoices):
         OTHER_CONTACT = 'C'
-        TOWER_CAPTAI = 'TC'
+        TOWER_CAPTAIN = 'TC'
         RINGING_MASTER = 'RM'
         STEEPLEKEEPER = 'SK'
 

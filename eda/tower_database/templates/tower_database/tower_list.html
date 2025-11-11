@@ -4,28 +4,49 @@
 
 {% block content %}
 
+<div class="row justify-content-center">
+
+    <div class="col-auto">
+
 <h1>{{ title }}</h1>
 
-<p>We believe our listsWe include all towers with 3 or more bells within the area of the Diocese of Ely (not all of which owned and maintained by the Diocese itself).</p>
+<p>We believe our lists include all towers with 3 or more bells within the area of the Diocese of Ely (not all of which owned and maintained by the Diocese itself).</p>
 
-<p>Each tower name is followed by the initial of its district (C, E, H or W), the number of bells, and 'n' if the bells are not able to be rung full-circle (unringable, hung for chiming only, tower unsafe, etc.)</p>
+      <table class="table table-responsive table-sm">
 
-<ul>
+        <thead>
+            <tr>
+                <td class="fw-bold">Place</td>
+                <td class="fw-bold">Dedication</td>
+                <td class="fw-bold">Bells</td>
+                <td class="fw-bold">Ringing status</td>
+                <td class="fw-bold">District</td>
+            </tr>
+        </thead>
 
-	{% for tower in object_list %}
+    <tbody class="table-group-divider">
+
+    	{% for tower in object_list %}
+
 
 		{% if split_by == 'district' %}
-		  {% ifchanged %}</ul><h2>{{ tower.get_district_display }} District</h2><ul>{% endifchanged %}
+		  {% ifchanged %}<tr><td collspan="5"><h2>{{ tower.get_district_display }} District</h2></td></tr>{% endifchanged %}
 		{% elif split_by == 'bells' %}
-		  {% ifchanged %}</ul><h2>{{ tower.bells }} Bells</h2><ul>{% endifchanged %}
+		  {% ifchanged %}<tr><td collspan="5"><h2>{{ tower.bells }} Bells</h2></td></tr>{% endifchanged %}
 		{% endif %}
 
-        <li><a href="{% url 'tower_detail' tower.id %}">{{ tower.place }}
-        {% if tower.include_dedication %}- {{ tower.dedication }}{% endif %}</a>
-        [{{ tower.district }}{{ tower.bells }}{% if tower.ringing_status == 'N' %}n{% endif %}]</li>
+        <tr class="text-start">
 
-	{% endfor %}
+            <td><b><a href="{% url 'tower_detail' tower.id %}">{{ tower.place }}</a></b></td>
+            <td>{{ tower.dedication }}</td>
+            <td>{{ tower.bells }}</td>
+            <td>{{ tower.get_ringing_status_display }}</td>
+            <td>{% if not tower.report %}<i>{% endif %}{{ tower.get_district_display }}{% if not tower.report %}</i>{% endif %}</td>
 
-</ul>
+        </tr>
+
+        {% endfor %}
+
+    </tbody>
 
 {% endblock %}
