@@ -49,7 +49,7 @@ class BellsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = 'Ringable towers by number of bells'
+        context["title"] = 'Towers rung full-circle, by number of bells'
         context["split_by"] = 'bells'
         return context
 
@@ -60,8 +60,10 @@ class UnBellsListView(ListView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["title"] = 'Non-ringable towers by number of bells'
+        context["title"] = 'Towers not rung full-circle, by number of bells'
         context["split_by"] = 'bells'
+        context["notes"] = ("Towers may not be rung full-circle because the bells are unringable or derelict, "
+                           "hung for chiming only, becasue the tower is unsafe, etc.")
         return context
 
 
