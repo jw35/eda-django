@@ -1,0 +1,31 @@
+{% extends 'eda/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<p>We believe our listsWe include all towers with 3 or more bells within the area of the Diocese of Ely (not all of which owned and maintained by the Diocese itself).</p>
+
+<p>Each tower name is followed by the initial of its district (C, E, H or W), the number of bells, and 'n' if the bells are not able to be rung full-circle (unringable, hung for chiming only, tower unsafe, etc.)</p>
+
+<ul>
+
+	{% for tower in object_list %}
+
+		{% if split_by == 'district' %}
+		  {% ifchanged %}</ul><h2>{{ tower.get_district_display }} District</h2><ul>{% endifchanged %}
+		{% elif split_by == 'bells' %}
+		  {% ifchanged %}</ul><h2>{{ tower.bells }} Bells</h2><ul>{% endifchanged %}
+		{% endif %}
+
+        <li><a href="{% url 'tower_detail' tower.id %}">{{ tower.place }}
+        {% if tower.include_dedication %}- {{ tower.dedication }}{% endif %}</a>
+        [{{ tower.district }}{{ tower.bells }}{% if tower.ringing_status == 'N' %}n{% endif %}]</li>
+
+	{% endfor %}
+
+</ul>
+
+{% endblock %}

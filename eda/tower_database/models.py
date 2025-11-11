@@ -80,13 +80,13 @@ class Tower(models.Model):
         NONE = 'N'
 
     class Days(models.TextChoices):
-        MONDAY = 'Mon'
-        TUESDAY = 'Tue'
-        WEDNESDAY = 'Wed'
-        THURSDAY = 'Thu'
-        FRIDAY = 'Fri'
-        SATURDAY = 'Sat'
-        SUNDAY = 'Sun'
+        MONDAY = '1'
+        TUESDAY = '2'
+        WEDNESDAY = '3'
+        THURSDAY = '4'
+        FRIDAY = '5'
+        SATURDAY = '6'
+        SUNDAY = '7'
 
     class PracticeWeeks(models.TextChoices):
         NOT = 'Not', 'Not'

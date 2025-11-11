@@ -1,4 +1,5 @@
 from django.core.management.base import BaseCommand, CommandError
+from django.db import connection
 
 from tower_database.models import Tower, Contact, ContactMap
 import requests
@@ -40,7 +41,7 @@ lookup_fields = (
     ('County', 'county', {'Cambridgeshire': 'C', 'Norfolk': 'N'}),
     ('District', 'district', {'Cambridge': 'C', 'Ely': 'E', 'Huntingdon': 'H', 'Wisbech': 'W'}),
     ('Status', 'ringing_status', {'Regular ringing': 'R', 'Occasional ringing': 'O', 'No ringing': 'N'}),
-    ('Day', 'practice_day', {'Monday': 'Mon', 'Tuesday': 'Tue', 'Wednesday': 'Wed', 'Thursday': 'Thu', 'Friday': 'Fri', 'Saturday': 'Sat', 'Sunday': 'Sun'}),
+    ('Day', 'practice_day', {'Monday': '1', 'Tuesday': '2', 'Wednesday': '3', 'Thursday': '4', 'Friday': '5', 'Saturday': '6', 'Sunday': '7'}),
     ('Type', 'ring_type', {'Full-circle ring': 'Full', 'Lightweight ring': 'Light',
                            'Carillon': 'Carillon', 'Tubular chime': 'T-chime',
                            'Hemispherical chime': 'H-chinme', 'Chime': 'Chime',
@@ -61,6 +62,11 @@ class Command(BaseCommand):
         # Clear out all the old stuff
         Tower.objects.all().delete()
         Contact.objects.all().delete()
+
+        # reset AUTOINCREMENT counters
+        with connection.cursor() as cursor:
+            cursor.execute("delete from sqlite_sequence where name='tower_database_tower';")
+            cursor.execute("delete from sqlite_sequence where name='tower_database_contact';")
 
         if options['file']:
             # REad from the supplied file

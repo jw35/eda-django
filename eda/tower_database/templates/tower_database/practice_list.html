@@ -1,0 +1,27 @@
+{% extends 'eda/base.html' %}
+
+{% load static %}
+
+{% block content %}
+
+<h1>{{ title }}</h1>
+
+<p>We believe our listsWe include all towers with 3 or more bells within the area of the Diocese of Ely (not all of which owned and maintained by the Diocese itself).</p>
+
+<ul>
+
+	{% for tower in object_list %}
+
+		{% ifchanged %}</ul><h2>{{ tower.get_practice_day_display }}</h2><ul>{% endifchanged %}
+
+        <li>{% if tower.travel_check %}<i>{% endif %}<a href="{% url 'tower_detail' tower.id %}">{{ tower.district }}
+        {{ tower.place }}
+        {% if tower.include_dedication %}- {{ tower.dedication }}{% endif %}
+        {% if tower.practice_weeks %}({{ tower.practice_weeks|join:", " }}){% endif %}</a>{% if tower.travel_check %}</i>{% endif %}
+        </li>
+
+	{% endfor %}
+
+</ul>
+
+{% endblock %}
