@@ -44,7 +44,7 @@ class SingleDistrictListView(ListView):
 
 
 class BellsListView(ListView):
-    queryset = Tower.objects.exclude(ringing_status = 'N')
+    queryset = Tower.objects.exclude(ringing_status = 'N').exclude(bells=None)
     ordering = ('-bells', 'place', 'dedication')
 
     def get_context_data(self, **kwargs):
@@ -55,7 +55,7 @@ class BellsListView(ListView):
 
 
 class UnBellsListView(ListView):
-    queryset = Tower.objects.filter(ringing_status = 'N')
+    queryset = Tower.objects.filter(ringing_status = 'N').exclude(bells=None)
     ordering = ('-bells', 'place', 'dedication')
 
     def get_context_data(self, **kwargs):
