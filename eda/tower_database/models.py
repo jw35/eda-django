@@ -20,7 +20,7 @@ class Contact(models.Model):
     name = models.CharField(max_length=100, blank=True, help_text="Contact name (with or without title), or role")
     phone = models.CharField(max_length=100, blank=True, help_text="Contact phone number")
     phone2 = models.CharField(max_length=100, blank=True, verbose_name="Phone", help_text="Alternate phone number")
-    email = models.EmailField(max_length=100, blank=True, help_text="Contact email address")
+    email = models.EmailField(max_length=100, blank=True, help_text="Contact email address (not necessirally the individual's)")
     form = models.URLField(blank=True, help_text="Link to a contact form")
     history = HistoricalRecords()
 
@@ -77,7 +77,7 @@ class TowerConstants():
     WEEKDAY_PATTERN = re.compile(r'\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)s?\b', re.IGNORECASE)
 
     # Valid phrases for week patterns
-    WEEK_PHRASE_PATTERN = re.compile(r'\bNot\b|1st|2nd|3rd|4th|5th|\bAlternate\b', re.IGNORECASE)
+    WEEK_PHRASE_PATTERN = re.compile(r'\bNot\b(?! Bank Holiday)|1st|2nd|3rd|4th|5th|\bAlternate\b', re.IGNORECASE)
 
 class Tower(models.Model):
 
@@ -203,7 +203,7 @@ class Tower(models.Model):
     lng = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
     position = models.CharField(max_length=20, blank=True)
     primary_contact = models.ForeignKey(Contact, blank=True, null=True, on_delete=models.PROTECT, related_name="tower_primary_set")
-    contact_restriction = models.CharField(max_length=10, choices=ContactRestrictions, default='NONE', help_text="Intended use of contact details")
+    contact_restriction = models.CharField(max_length=10, blank=True, choices=ContactRestrictions, help_text="Intended use of contact details")
     other_contacts = models.ManyToManyField(Contact, through="ContactMap", related_name="tower_oher_set")
     peals = models.PositiveIntegerField(null=True , blank=True, help_text="Peals in most recent Annual Report")
     dove_towerid = models.CharField(max_length=10, blank=True, verbose_name="Dove TowerID")
