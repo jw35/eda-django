@@ -77,7 +77,7 @@ class TowerConstants():
     WEEKDAY_PATTERN = re.compile(r'\b(Monday|Tuesday|Wednesday|Thursday|Friday|Saturday|Sunday)s?\b', re.IGNORECASE)
 
     # Valid phrases for week patterns
-    WEEK_PHRASE_PATTERN = re.compile(r'1st|2nd|3rd|4th|5th')
+    WEEK_PHRASE_PATTERN = re.compile(r'\bNot\b|1st|2nd|3rd|4th|5th|\bAlternate\b', re.IGNORECASE)
 
 class Tower(models.Model):
 
@@ -106,13 +106,13 @@ class Tower(models.Model):
         SUNDAY = '7'
 
     class PracticeWeeks(models.TextChoices):
-        NOT = 'Not', 'Not'
+        NOT = 'not', 'Not'
         W1 = '1st', '1st'
         W2 = '2nd', '2nd'
         W3 = '3rd', '3rd'
         W4 = '4th', '4th'
         W5 = '5th', '5th'
-        ALT = 'Alt', 'Alternate'
+        ALT = 'alternate', 'Alternate'
 
     class RingTypes(models.TextChoices):
         FULL = 'Full', 'Full-circle ring'
@@ -127,8 +127,7 @@ class Tower(models.Model):
         OTHER = 'Other', 'Other bells'
 
 
-    class ContactUses(models.TextChoices):
-        ALL = 'All'
+    class ContactRestrictions(models.TextChoices):
         BELLS_ONLY = 'Bells only'
         BAND_ONLY = 'Band only'
         NONE = 'None'
@@ -204,7 +203,7 @@ class Tower(models.Model):
     lng = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
     position = models.CharField(max_length=20, blank=True)
     primary_contact = models.ForeignKey(Contact, blank=True, null=True, on_delete=models.PROTECT, related_name="tower_primary_set")
-    contact_use = models.CharField(max_length=10, choices=ContactUses, default='All', help_text="Intended use of contact details")
+    contact_restriction = models.CharField(max_length=10, choices=ContactRestrictions, default='NONE', help_text="Intended use of contact details")
     other_contacts = models.ManyToManyField(Contact, through="ContactMap", related_name="tower_oher_set")
     peals = models.PositiveIntegerField(null=True , blank=True, help_text="Peals in most recent Annual Report")
     dove_towerid = models.CharField(max_length=10, blank=True, verbose_name="Dove TowerID")
@@ -244,7 +243,7 @@ class Tower(models.Model):
 
         # ringing & saervice/practice
         if self.ringing_status == Tower.RingingStatus.NONE and (self.service or self.practice):
-            errors['ringing_status'].append(f"Iinconsistent with Service or Practice")
+            errors['ringing_status'].append(f"Inconsistent with Service or Practice")
 
         # practice_day & practice
         if ((self.get_practice_day_display().lower() not in self.practice.lower()) or
@@ -259,12 +258,14 @@ class Tower(models.Model):
 
         # practice_weeks & practice
         if not TowerConstants.CHECK_PATTERN.search(self.practice):
+            # Is every relevant phrase in `practice` reflected in `practice_weeks`?
             for phrase in TowerConstants.WEEK_PHRASE_PATTERN.findall(self.practice):
-                if phrase not in self.practice_weeks:
+                if phrase.lower() not in self.practice_weeks:
                     errors['practice_weeks'].append(f"'{phrase}' appears in in Practice")
 
+        # Does everything in `practice_weeks` appear in `practice`
         for phrase in self.practice_weeks:
-            if phrase.lower() not in self.practice.lower():
+            if not re.search(r'\b' + phrase + r'\b', self.practice, re.IGNORECASE):
                 errors['practice_weeks'].append(f"'{phrase}' doesn't appear in Practice")
 
 
@@ -314,7 +315,9 @@ class Photo(models.Model):
 class ContactMap(models.Model):
 
     class Roles(models.TextChoices):
-        OTHER_CONTACT = 'C'
+        OTHER_GENERAL_CONTACT = 'C'
+        OTHER_BELLS_CONTACT = 'BL'
+        OTHER_BAND_CONTACT = 'BA'
         TOWER_CAPTAIN = 'TC'
         RINGING_MASTER = 'RM'
         STEEPLEKEEPER = 'SK'

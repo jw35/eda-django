@@ -97,6 +97,7 @@ class Command(BaseCommand):
                     setattr(db_row, t, l[csv_row[f]])
 
             weeks = re.split(r', +', csv_row['Week'])
+            print(weeks)
             db_row.practice_weeks = weeks
 
             db_row.bells = int(csv_row['Bells'])
@@ -107,15 +108,12 @@ class Command(BaseCommand):
                 (contact, created) = Contact.objects.get_or_create(name=csv_row['Secretary'], phone=csv_row['Phone'], email=csv_row['Email'])
                 db_row.primary_contact = contact
 
-            contact_use = ''
             if csv_row['Band contact'] and csv_row['Bells contact']:
-                db_row.contact_use = 'All'
+                db_row.contact_restriction = Tower.ContactRestrictions.NONE
             elif csv_row['Band contact']:
-                db_row.contact_use = 'Band only'
+                db_row.contact_restriction = Tower.ContactRestrictions.BAND_ONLY
             elif csv_row['Bells contact']:
-                db_row.contact_use = 'Bells only'
-            else:
-                db_row.contact_use = 'None'
+                db_row.contact_restriction = Tower.ContactRestrictions.BELLS_ONLY
 
             db_row.position = f"{ csv_row['Lat'] },{ csv_row['Lng'] }"
 

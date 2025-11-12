@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% block title %}{{ tower.place }} {{ tower.dedication }}{% endblock %}
+
 {% block content %}
 
 <div class="row justify-content-center">
@@ -15,8 +17,16 @@
 	<tbody>
 
 	<tr class="text-start">
+		<td class="fw-bold">Place</td>
+		<td>{{ tower.place }}</td>
+	</tr>
+	<tr class="text-start">
 		<td class="fw-bold">County</td>
 		<td>{{ tower.get_county_display }}</td>
+	</tr>
+	<tr class="text-start">
+		<td class="fw-bold">Dedication</td>
+		<td>{{ tower.dedication }}</td>
 	</tr>
 	{% if tower.fulldedication %}
 	<tr>
@@ -33,10 +43,6 @@
 	<tr>
 		<td class="fw-bold">District</td>
 		<td>{{ tower.get_district_display }}</td>
-	</tr>
-	<tr>
-		<td class="fw-bold">In the Annual Report</td>
-		<td>{{ tower.report|yesno|capfirst }}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">Ringing Status</td>
@@ -80,21 +86,17 @@
 	</tr>
 	<tr>
 		<td class="fw-bold">Latitide, Longitude</td>
-		<td>{{ tower.lat }}, {{ tower.lng }} (<a href="https://www.google.com/maps/search/?api=1&query={{ tower.lat }},{{ tower.lng }}">Google map</a>)</td>
+		<td>{{ tower.lat }}, {{ tower.lng }} (<a href="https://www.google.com/maps/search/?api=1&query={{ tower.lat }},{{ tower.lng }}">Google</a>, <a href="https://www.openstreetmap.org/?mlat={{ tower.lat}}&mlon={{ tower.lng }}&zoom=16">OpenStreetMap</a>)</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">Primary Contact</td>
-		<td>{% if tower.contact_use != 'None' %}{{ tower.primary_contact.as_links }}{% endif %}</td>
-	</tr>
-	<tr>
-		<td class="fw-bold">Contact use</td>
-		<td>{% if tower.contact_use != 'None' %}{{ tower.contact_use }}{% endif %}</td>
+		<td>{{ tower.primary_contact.as_links }}{% if tower.contact_restriction != 'None' %} (for {{ tower.contact_restriction }}){% endif %}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">Other contacts</td>
 		<td>
 	    {% for other in other_contacts.all %}
-		{{ other.get_role_display }}: {{ other.contact.as_links }}<br>
+		<i>{{ other.get_role_display }}</i>: {{ other.contact.as_links }}<br>
 		{% endfor %}
 	    </td>
 	</tr>
@@ -106,17 +108,25 @@
     	{% endfor %}
         </td>
     </tr>
+    <tr>
+		<td class="fw-bold">Other links</td>
+		<td><a href="{{ tower.dove_link }}">Dove</a> <a href="{{ tower.bellboard_link }}">BellBoard</a>  <a href="{{ tower.felstead_link }}">Felsted database</a></td>
+	</tr>
 	<tr>
 		<td class="fw-bold">EDA peals</td>
 		<td>{{ tower.peals }}</td>
 	</tr>
 	<tr>
-		<td class="fw-bold">Dove TowerID/RingID</td>
-		<td><a href="{{ tower.dove_link }}">{{ tower.dove_towerid }}</a>/{{ tower.dove_ringid }} (<a href="{{ tower.bellboard_link }}">BellBoard</a>) </td>
+		<td class="fw-bold">In EDA Annual Report</td>
+		<td>{{ tower.report|yesno|capfirst }}</td>
+	</tr>
+	<tr>
+		<td class="fw-bold">Dove TowerID / RingID</td>
+		<td>{{ tower.dove_towerid }} / {{ tower.dove_ringid }} </td>
 	</tr>
 	<tr>
 		<td class="fw-bold">Towerbase ID</td>
-		<td>{{ tower.towerbase_id }} (<a href="{{ tower.felstead_link }}">Felsted database</a>)</td>
+		<td>{{ tower.towerbase_id }}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">Notes</td>

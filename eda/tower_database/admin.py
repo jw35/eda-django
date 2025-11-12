@@ -142,7 +142,7 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
             "Contacts, links and notes", {
                 "fields": (
                     "primary_contact",
-                    "contact_use",
+                    "contact_restriction",
                     "dove_ringid",
                     "dove_towerid",
                     "dove_link_html",

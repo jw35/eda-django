@@ -2,6 +2,8 @@
 
 {% load static %}
 
+{% block title %}{{ title }}{% endblock %}
+
 {% block content %}
 
 <div class="row justify-content-center">
@@ -10,7 +12,7 @@
 
 <h1>{{ title }}</h1>
 
-<p>We believe our lists include all towers with 3 or more bells within the area of the Diocese of Ely (not all of which owned and maintained by the Diocese itself).</p>
+<p>We believe our lists include all towers with 3 or more bells within the area of the Diocese of Ely<br>(not all of which owned and maintained by the Diocese itself).</p>
 
 {% if notes %}
 <p>{{ notes }}</p>
@@ -45,7 +47,7 @@
             <td>{{ tower.dedication }}</td>
             <td>{{ tower.bells }}</td>
             <td>{{ tower.get_ringing_status_display }}</td>
-            <td>{% if not tower.report %}<i>{% endif %}{{ tower.get_district_display }}{% if not tower.report %}</i>{% endif %}</td>
+            <td>{{ tower.get_district_display }}</td>
 
         </tr>
 

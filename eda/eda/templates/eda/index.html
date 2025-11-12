@@ -8,29 +8,34 @@
 
     <div class="col-auto">
 
-<h1>Ely DA Administration</h1>
+<h1>Ely DA Automation</h1>
 
 <p>Under development - please ignore</p>
 
-<ul>
-	<li>Towers:
-		<ul>
-			<li><a href="{% url 'tower_list' %}">All towers</a></li>
-			<li><a href="{% url 'district_list' %}">All towers by District</a>
-				<ul>
-					<li><a href="{% url 'single_district_list' d='cambridge' %}">Just Cambridge</a></li>
-					<li><a href="{% url 'single_district_list' d='ely' %}">Just Ely</a></li>
-					<li><a href="{% url 'single_district_list' d='huntingdon' %}">Just Huntingdon</a></li>
-					<li><a href="{% url 'single_district_list' d='wisbech' %}">Just Wisbech</a></li>
-				</ul>
-			</li>
-			<li><a href="{% url 'bells_list' %}">Towers rung full-circle, by number of bells</a></li>
-			<li><a href="{% url 'un_bells_list' %}">Towewrs not rung full-circle, by number of bells</a></li>
-			<li><a href="{% url 'practice_night_list' %}">Towers by practice night</a></li>
-		</ul>
-	</li>
-	<li><a href="/admin">Site admin</a></li>
-</ul>
+
+<h2>Tower Database</h2>
+
+
+	<ul>
+		<li><a href="{% url 'tower_list' %}">All towers</a></li>
+		<li><a href="{% url 'district_list' %}">All towers by District</a>
+			<ul>
+				<li><a href="{% url 'single_district_list' d='cambridge' %}">Just Cambridge</a></li>
+				<li><a href="{% url 'single_district_list' d='ely' %}">Just Ely</a></li>
+				<li><a href="{% url 'single_district_list' d='huntingdon' %}">Just Huntingdon</a></li>
+				<li><a href="{% url 'single_district_list' d='wisbech' %}">Just Wisbech</a></li>
+			</ul>
+		</li>
+		<li><a href="{% url 'bells_list' %}">Towers rung full-circle, by number of bells</a></li>
+		<li><a href="{% url 'un_bells_list' %}">Towewrs not rung full-circle, by number of bells</a></li>
+		<li><a href="{% url 'practice_night_list' %}">Towers by practice night</a></li>
+	</ul>
+
+<h2>Admin</h2>
+
+<a href="/admin">Site admin</a>
+
+<hr>
 
 <address>
 	<p>Contact <a href="mailto:webmaster@elyda.org.uk">webmaster@elyda.org.uk</a></p>
@@ -39,7 +44,6 @@
 </div>
 
 </div>
-
 
 </body>
 
