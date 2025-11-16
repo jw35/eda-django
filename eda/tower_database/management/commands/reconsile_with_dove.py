@@ -1,6 +1,6 @@
 from django.core.management.base import BaseCommand, CommandError
 
-from tower_database.models import Tower, Contact, DoveTower
+from tower_database.models import Tower, Contact, Dove
 import re
 
 from unidecode import unidecode
@@ -112,8 +112,8 @@ class Command(BaseCommand):
             errors = []
 
             try:
-                dove_tower = DoveTower.objects.get(ringid=tower.dove_ringid)
-            except DoveTower.DoesNotExist:
+                dove_tower = Dove.objects.get(ringid=tower.dove_ringid)
+            except Dove.DoesNotExist:
                 errors.append(f"[RingID] '{dove.ring_id}' not found")
             else:
 

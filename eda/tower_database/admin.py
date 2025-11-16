@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.contrib.auth import get_permission_codename
 from django.forms import ModelForm
 from django.utils.html import urlize, escape
 from django.utils.safestring import mark_safe
@@ -9,7 +10,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 
-from .models import Contact, Tower, ContactMap, Photo, Website, DoveTower
+from .models import Contact, Tower, ContactMap, Photo, Website, Dove
 
 from position_widget.widgets import PositionInput
 
@@ -78,6 +79,19 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     search_fields = ["place", "dedication", "full_dedication", "nickname"]
     search_help_text = "Search by place or dedication"
     readonly_fields = ["dove_link_html", "bellboard_link_html", "felstead_link_html"]
+
+    def has_change_permission(self, request, obj=None):
+        '''
+        Towers can be edited by anyone with the 'admin_[district]" permission for the,
+        district of this object, or who would be able to change it under the Djago standard rules
+        '''
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
+
 
     def dove_link_html(self, instance):
         return mark_safe(urlize(instance.dove_link, nofollow=True, autoescape=True))
@@ -157,7 +171,7 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
         )
     ]
 
-class DoveTowerAdmin(SearchAutoCompleteAdmin):
+class DoveAdmin(SearchAutoCompleteAdmin):
     search_fields = ["place", "dedicn", "towerid", "ringid"]
     search_help_text = "Search by place or dedication (or tower or ring  ID)"
     list_display = ["__str__", "bells"]
@@ -174,5 +188,5 @@ class DoveTowerAdmin(SearchAutoCompleteAdmin):
 
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Tower, TowerAdmin)
-admin.site.register(DoveTower, DoveTowerAdmin)
+admin.site.register(Dove, DoveAdmin)
 admin.site.register(Photo, PhotoAdmin)

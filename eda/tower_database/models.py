@@ -279,6 +279,12 @@ class Tower(models.Model):
             models.UniqueConstraint(fields=["place", "dedication"], name="unique_place_dedication",
                 violation_error_message="Can't have two towers with the same place and dedication")
         ]
+        permissions = [
+            ('admin_cambridge', 'Can admin Cambridge towers'),
+            ('admin_ely', 'Can admin Ely towers'),
+            ('admin_huntingdon', 'Can admin Huntingdon towers'),
+            ('admin_wisbech', 'Can admin Wisbech towers')
+        ]
 
 
 class Website(models.Model):
@@ -345,7 +351,7 @@ class ContactMap(models.Model):
 
 # Auto-generated with ./manage.py inspectdb
 
-class DoveTower(models.Model):
+class Dove(models.Model):
     towerid = models.CharField(db_column='TowerID', blank=True, null=True)  # Field name made lowercase.
     ringid = models.CharField(db_column='RingID', primary_key=True)  # Field name made lowercase.
     ringtype = models.CharField(db_column='RingType', blank=True, null=True)  # Field name made lowercase.
@@ -403,3 +409,4 @@ class DoveTower(models.Model):
         managed = False
         db_table = 'dove_towers'
         ordering = ["place", "dedicn"]
+        verbose_name = 'Dove Record'
