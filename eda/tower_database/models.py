@@ -266,7 +266,7 @@ class ContactPerson(models.Model):
         verbose_name_plural = "Contact People"
         constraints = [
             models.CheckConstraint(
-                condition=~Q(name='') | ~Q(persoal_phone='') | ~Q(personal_phone2='') | ~Q(personal_email=''),
+                condition=~Q(name='') | ~Q(personal_phone='') | ~Q(personal_phone2='') | ~Q(personal_email=''),
                 name="no_non_blank_contact_persons",
                 violation_error_message="Contact Person details can't be entirely blank"
             ),
