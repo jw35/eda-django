@@ -2,7 +2,7 @@ from django.http import Http404
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 
-from .models import Tower, ContactMap
+from .models import Tower
 
 # Create your views here.
 
@@ -84,5 +84,4 @@ class TowerDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["other_contacts"] = ContactMap.objects.filter(tower=self.object)
         return context
