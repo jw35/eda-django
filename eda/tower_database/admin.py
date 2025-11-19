@@ -10,11 +10,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 
-<<<<<<< HEAD
-from .models import Contact, Tower, ContactMap, Photo, Website, Dove
-=======
 from .models import ContactPerson, Contact, Tower, Photo, Website, DoveTower
->>>>>>> rework-contacts
 
 from position_widget.widgets import PositionInput
 
