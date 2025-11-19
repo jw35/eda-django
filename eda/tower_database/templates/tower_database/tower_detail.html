@@ -2,7 +2,7 @@
 
 {% load static %}
 
-{% block title %}{{ tower.place }} {{ tower.dedication }}{% endblock %}
+{% block title %}{{ tower.place }} - {{ tower.dedication }}{% endblock %}
 
 {% block content %}
 
@@ -10,7 +10,7 @@
 
     <div class="col-auto">
 
-<h1>{{ tower.place }} {{ tower.dedication }}</h1>
+<h1>{{ tower.place }} - {{ tower.dedication }}</h1>
 
 <table class="table table-responsive table-sm">
 
@@ -89,14 +89,20 @@
 		<td>{{ tower.lat }}, {{ tower.lng }} (<a href="https://www.google.com/maps/search/?api=1&query={{ tower.lat }},{{ tower.lng }}">Google</a>, <a href="https://www.openstreetmap.org/?mlat={{ tower.lat}}&mlon={{ tower.lng }}&zoom=16">OpenStreetMap</a>)</td>
 	</tr>
 	<tr>
-		<td class="fw-bold">Primary Contact</td>
-		<td>{{ tower.primary_contact.as_links }}{% if tower.contact_restriction != 'None' %} (for {{ tower.contact_restriction }}){% endif %}</td>
+		<td class="fw-bold">Primary contact</td>
+		<td>
+	    {% if tower.primary_contact.publish %}
+		<i>{{ tower.primary_contact.as_links }}{% if tower.primary_contact.role == 'BL' %} (Bells Only){% endif %}{% if tower.primary_contact.role == 'BA' %} (Band Only){% endif %}<br>
+		{% endif %}
+	    </td>
 	</tr>
 	<tr>
 		<td class="fw-bold">Other contacts</td>
 		<td>
-	    {% for other in other_contacts.all %}
-		<i>{{ other.get_role_display }}</i>: {{ other.contact.as_links }}<br>
+	    {% for contact in tower.other_contacts %}
+	    {% if contact.publish %}
+		<i>{{ contact.get_role_display }}</i>: {{ contact.as_links }}<br>
+		{% endif %}
 		{% endfor %}
 	    </td>
 	</tr>

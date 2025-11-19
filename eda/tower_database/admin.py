@@ -9,7 +9,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 
-from .models import Contact, Tower, ContactMap, Photo, Website, DoveTower
+from .models import ContactPerson, Contact, Tower, Photo, Website, DoveTower
 
 from position_widget.widgets import PositionInput
 
@@ -17,28 +17,19 @@ admin.site.site_header = "Ely DA Admin"
 admin.site.site_title = "Database admin"
 admin.site.index_title = "Database admin"
 
+class ContactPersonInline(admin.TabularInline):
+    model = ContactPerson
+    extra = 0
+
+class ContactInlineForPerson(admin.TabularInline):
+    model = Contact
+    fields = ["role", "tower", "publish", "primary"]
+    readonly_fields = ["role", "tower", "publish", "primary"]
+    extra = 0
 
 class ContactInline(admin.TabularInline):
-    model = Tower.other_contacts.through
-    verbose_name = "other contact"
+    model = Contact
     extra = 0
-    #classes = ["collapse"]
-
-class PrimaryContactInline(admin.TabularInline):
-    model = Tower
-    fields = ["__str__"]
-    readonly_fields = ["__str__"]
-    verbose_name = "primary contact"
-    extra = 0
-    can_delete = False
-
-class TowerInline(admin.TabularInline):
-    model = Tower.other_contacts.through
-    fields = ["role", "tower", "publish"]
-    readonly_fields = ["role", "tower", "publish"]
-    verbose_name = "as other contact"
-    extra = 0
-    can_delete = False
 
 class WebsiteInline(admin.TabularInline):
     model = Website
@@ -47,20 +38,28 @@ class WebsiteInline(admin.TabularInline):
 
 class PhotoInline(admin.StackedInline):
     model = Photo
-    fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
-    readonly_fields = ["tower", "photo_tag", "photo_height", "photo_width"]
     extra = 0
     #classes = ["collapse"]
 
 class PhotoAdmin(SimpleHistoryAdmin):
     fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
-    readonly_fields = ["tower", "photo_tag", "photo_height", "photo_width"]
+    list_display = ["tower", "photo_tag"]
 
+class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
+    search_fields = ["website"]
+    search_help_text = "Search by website address"
+    fields = ["tower", "website"]
+    list_display = ["tower", "website"]
+
+class ContactPersonAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
+    search_fields = ["forename", "name", "personal_phone", "personal_phone2", "personal_email"]
+    search_help_text = "Search by name, phone number or email"
+    list_display = ["name", "title", "forename", "personal_phone", "personal_phone2", "personal_email"]
+    inlines = [ContactInlineForPerson]
 
 class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    inlines= [PrimaryContactInline, TowerInline]
-    search_fields = ["name", "phone", "phone2", "email"]
-    search_help_text = "Search by name, phone number or email"
+    list_display = ["tower", "role", "person", "email", "form"]
+    readonly_fields = ["tower"]
 
 class MyTowerAdminForm(ModelForm):
     class Meta:
@@ -72,7 +71,7 @@ class MyTowerAdminForm(ModelForm):
 
 class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     form = MyTowerAdminForm
-    inlines = [WebsiteInline, ContactInline, PhotoInline]
+    inlines = [ContactInline, WebsiteInline, PhotoInline]
     list_display = ["__str__", "district", "bells"]
     list_filter = ["district", "report", "bells", "ringing_status", "ring_type", "practice_day"]
     search_fields = ["place", "dedication", "full_dedication", "nickname"]
@@ -139,10 +138,8 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
             }
         ),
         (
-            "Contacts, links and notes", {
+            "Links and notes", {
                 "fields": (
-                    "primary_contact",
-                    "contact_restriction",
                     "dove_ringid",
                     "dove_towerid",
                     "dove_link_html",
@@ -160,7 +157,7 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 class DoveTowerAdmin(SearchAutoCompleteAdmin):
     search_fields = ["place", "dedicn", "towerid", "ringid"]
     search_help_text = "Search by place or dedication (or tower or ring  ID)"
-    list_display = ["__str__", "bells"]
+    list_display = ["__str__", "county", "country", "bells"]
     list_filter = ["bells", "ringtype", ("ur", admin.EmptyFieldListFilter), "county", "country", "diocese"]
 
     def get_readonly_fields(self, request, obj=None):
@@ -172,7 +169,9 @@ class DoveTowerAdmin(SearchAutoCompleteAdmin):
     def has_add_permission(self, request):
         return False
 
+admin.site.register(ContactPerson, ContactPersonAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Tower, TowerAdmin)
 admin.site.register(DoveTower, DoveTowerAdmin)
 admin.site.register(Photo, PhotoAdmin)
+admin.site.register(Website, WebsiteAdmin)

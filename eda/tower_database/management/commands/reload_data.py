@@ -2,7 +2,7 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 from django.forms import ModelForm
 
-from tower_database.models import Tower, Contact, ContactMap
+from tower_database.models import Tower, Contact, ContactPerson, Website, Photo
 import requests
 import csv
 import re
@@ -67,11 +67,17 @@ class Command(BaseCommand):
         # Clear out all the old stuff
         Tower.objects.all().delete()
         Contact.objects.all().delete()
+        ContactPerson.objects.all().delete()
+        Website.objects.all().delete()
+        Photo.objects.all().delete()
 
         # reset AUTOINCREMENT counters
         with connection.cursor() as cursor:
             cursor.execute("delete from sqlite_sequence where name='tower_database_tower';")
             cursor.execute("delete from sqlite_sequence where name='tower_database_contact';")
+            cursor.execute("delete from sqlite_sequence where name='tower_database_contact_person';")
+            cursor.execute("delete from sqlite_sequence where name='tower_database_website';")
+            cursor.execute("delete from sqlite_sequence where name='tower_database_photo';")
 
         # Read the data from a file or direct from the spreadsheet
         if options['file']:
@@ -114,19 +120,6 @@ class Command(BaseCommand):
             if csv_row['Peals']:
                 db_row['peals'] = int(csv_row['Peals'])
 
-            if csv_row['Secretary'] or csv_row['Phone'] or csv_row['Email']:
-                (contact, created) = Contact.objects.get_or_create(name=csv_row['Secretary'], phone=csv_row['Phone'], email=csv_row['Email'])
-                db_row['primary_contact'] = contact
-
-            if csv_row['Band contact'] and csv_row['Bells contact']:
-                db_row['contact_restriction'] = Tower.ContactRestrictions.NONE
-            elif csv_row['Band contact']:
-                db_row['contact_restriction'] = Tower.ContactRestrictions.BAND_ONLY
-            elif csv_row['Bells contact']:
-                db_row['contact_restriction'] = Tower.ContactRestrictions.BELLS_ONLY
-            else:
-                db_row['contact_restriction'] = ''
-
             db_row['lat'] = round(float(csv_row['Lat']), 5)
             db_row['lng'] = round(float(csv_row['Lng']), 5)
 
@@ -144,6 +137,47 @@ class Command(BaseCommand):
                     print(f.non_field_errors())
             # ...and if it validates, save it
             else:
+
                 new_row = f.save()
+
+                # Add contact(s)
+
+                if csv_row['Secretary'] or csv_row['Phone'] or csv_row['Email']:
+
+                    publish = True
+                    if csv_row['Band contact'] and csv_row['Bells contact']:
+                        role = Contact.Roles.CONTACT
+                    elif csv_row['Band contact']:
+                        role = Contact.Roles.BAND_CONTACT
+                    elif csv_row['Bells contact']:
+                        role = Contact.Roles.BELLS_CONTACT
+                    else:
+                        role = Contact.Roles.CONTACT
+                        publish = False
+
+                    # Make a new ContactPerson and ann them to Contact if we have a name or phone number
+                    if csv_row['Secretary'] or csv_row['Phone']:
+
+                        match = re.match(r'((Mr|Mrs|Miss|Revd|Dr) +)?(.+) +(\w+)', csv_row['Secretary'])
+                        if match:
+                            title = match.group(2) if match.group(2) else ''
+                            forename = match.group(3) if match.group(3) else ''
+                            name = match.group(4) if match.group(4) else ''
+                        else:
+                            title = forename = ''
+                            name = csv_row['Secretary']
+
+                        (contact_person, created) = ContactPerson.objects.get_or_create(title=title, forename=forename, name=name, personal_phone=csv_row['Phone'], personal_email=csv_row['Email'])
+
+                        new_row.contact_set.create(role=role, publish=publish, primary=True, person=contact_person)
+
+                    # Otherwise, just add a new Contact
+                    else:
+
+                        new_row.contact_set.create(role=role, publish=publish, primary=True, email=csv_row['Email'])
+
+
+                # Add website
+
                 if csv_row['Website']:
                     new_row.website_set.create(website=csv_row['Website'])

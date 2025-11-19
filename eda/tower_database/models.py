@@ -16,44 +16,6 @@ from collections import defaultdict
 
 # Create your models here.
 
-class Contact(models.Model):
-    name = models.CharField(max_length=100, blank=True, help_text="Contact name (with or without title), or role")
-    phone = models.CharField(max_length=100, blank=True, help_text="Contact phone number")
-    phone2 = models.CharField(max_length=100, blank=True, verbose_name="Phone", help_text="Alternate phone number")
-    email = models.EmailField(max_length=100, blank=True, help_text="Contact email address (not necessirally the individual's)")
-    form = models.URLField(blank=True, help_text="Link to a contact form")
-    history = HistoricalRecords()
-
-    def __str__(self):
-        return ' / '.join([f for f in (self.name, self.phone, self.phone2, self.email, self.form) if f != ''])
-
-    @property
-    def as_links(self):
-        fragments = []
-        if self.name:
-            fragments.append(self.name)
-        if self.phone:
-            fragments.append(self.phone)
-        if self.phone2:
-            fragments.append(self.phone2)
-        if self.email:
-            fragments.append(f'<a href="mailto:{self.email}">{self.email}</a>')
-        if self.form:
-            fragments.append(f'<a href="{self.form}">Contact form</a>')
-        return mark_safe(' / '.join(fragments))
-
-
-    class Meta:
-        ordering = ["name", "email"]
-        unique_together = "name", "phone", "phone2", "email", "form"
-        constraints = [
-            models.CheckConstraint(
-                condition=~Q(name='') | ~Q(phone='') | ~Q(phone2='') | ~Q(email='') | ~Q(form=''),
-                name="no_non_blank_contacts",
-                violation_error_message="Contacts can't be entirely blank"
-            ),
-        ]
-
 class TowerConstants():
 
     # Probable times without leading '0''
@@ -78,6 +40,7 @@ class TowerConstants():
 
     # Valid phrases for week patterns
     WEEK_PHRASE_PATTERN = re.compile(r'\bNot\b(?! Bank Holiday)|1st|2nd|3rd|4th|5th|\bAlternate\b', re.IGNORECASE)
+
 
 class Tower(models.Model):
 
@@ -125,12 +88,6 @@ class Tower(models.Model):
         DISPLAY = 'Display', 'Display bells'
         FUTURE = 'Future', 'Future ring'
         OTHER = 'Other', 'Other bells'
-
-
-    class ContactRestrictions(models.TextChoices):
-        BELLS_ONLY = 'Bells only'
-        BAND_ONLY = 'Band only'
-        NONE = 'None'
 
     def bell_validator(value):
         if value < 3 or value > 12:
@@ -202,9 +159,6 @@ class Tower(models.Model):
     lat = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
     lng = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
     position = models.CharField(max_length=20, blank=True)
-    primary_contact = models.ForeignKey(Contact, blank=True, null=True, on_delete=models.PROTECT, related_name="tower_primary_set")
-    contact_restriction = models.CharField(max_length=10, blank=True, choices=ContactRestrictions, help_text="Intended use of contact details")
-    other_contacts = models.ManyToManyField(Contact, through="ContactMap", related_name="tower_oher_set")
     peals = models.PositiveIntegerField(null=True , blank=True, help_text="Peals in most recent Annual Report")
     dove_towerid = models.CharField(max_length=10, blank=True, verbose_name="Dove TowerID")
     dove_ringid = models.CharField(max_length=10, blank=True, verbose_name="Dove RingID")
@@ -214,11 +168,29 @@ class Tower(models.Model):
     maintainer_notes = models.TextField(blank=True)
     history = HistoricalRecords()
 
+    class Meta:
+        ordering = ["place", "dedication"]
+        constraints = [
+            models.UniqueConstraint(fields=["place", "dedication"], name="unique_place_dedication",
+                violation_error_message="Can't have two towers with the same place and dedication")
+        ]
+
     def __str__(self):
         return f'{self.place}  ({self.dedication})'
 
     def get_absolute_url(self):
         return reverse("tower_detail", kwargs={"pk": self.pk})
+
+    @property
+    def primary_contact(self):
+        for contact in self.contact_set.all():
+            if contact.primary:
+                return contact
+        return None
+
+    @property
+    def other_contacts(self):
+        return [c for c in self.contact_set.all() if not c.primary]
 
     @property
     def dove_link(self):
@@ -231,7 +203,6 @@ class Tower(models.Model):
     @property
     def felstead_link(self):
         return f"https://felstead.cccbr.org.uk/tbid.php?tid={self.towerbase_id}"
-
 
     def clean(self):
 
@@ -268,17 +239,99 @@ class Tower(models.Model):
             if not re.search(r'\b' + phrase + r'\b', self.practice, re.IGNORECASE):
                 errors['practice_weeks'].append(f"'{phrase}' doesn't appear in Practice")
 
-
         if errors:
             raise ValidationError(errors)
 
 
+class ContactPerson(models.Model):
+
+    class Titles(models.TextChoices):
+        MR = 'Mr', 'Mr.'
+        MRS = 'Mrs', 'Mrs.'
+        MISS = 'Miss', 'Miss.'
+        DR = 'Dr', 'Dr.'
+        REVD = 'Revd', "The Rev'd"
+
+    title = models.CharField(max_length=5, blank=True, choices=Titles, help_text="Person's title (if required - usually leave blank)")
+    forename = models.CharField(max_length=100, blank=True, help_text="Person's forename")
+    name = models.CharField(max_length=100, blank=True, help_text="Person's surname, or office title")
+    personal_phone = models.CharField(max_length=100, blank=True, help_text="Personal/office contact phone number")
+    personal_phone2 = models.CharField(max_length=100, blank=True, verbose_name="Other personal phone", help_text="Alternate personal/office phone number")
+    personal_email = models.EmailField(max_length=100, blank=True, help_text="Personal/office email address")
+    history = HistoricalRecords()
+
     class Meta:
-        ordering = ["place", "dedication"]
+        ordering = ["name", "forename", "title"]
+        unique_together = ["title", "forename", "name", "personal_phone", "personal_phone2", "personal_email"]
+        verbose_name_plural = "Contact People"
         constraints = [
-            models.UniqueConstraint(fields=["place", "dedication"], name="unique_place_dedication",
-                violation_error_message="Can't have two towers with the same place and dedication")
+            models.CheckConstraint(
+                condition=~Q(name='') | ~Q(persoal_phone='') | ~Q(personal_phone2='') | ~Q(personal_email=''),
+                name="no_non_blank_contact_persons",
+                violation_error_message="Contact Person details can't be entirely blank"
+            ),
         ]
+
+    def __str__(self):
+        if self.full_name:
+            return self.full_name
+        elif self.personal_email:
+            return self.personal_email
+        elif self.personal_phone or self.personal_phone2:
+            return ' / '.join([f for f in (self.personal_phone, self.personal_phone2) if f != ''])
+        else:
+            return '--blank contact person--'
+
+    @property
+    def full_name(self):
+        return ' '.join([f for f in (self.title, self.forename, self.name) if f != ''])
+
+
+class Contact(models.Model):
+
+    class Roles(models.TextChoices):
+        CONTACT = 'C', 'General contact'
+        BELLS_CONTACT = 'BL'
+        BAND_CONTACT = 'BA'
+        TOWER_CAPTAIN = 'TC'
+        RINGING_MASTER = 'RM'
+        STEEPLEKEEPER = 'SK'
+
+    role = models.CharField(max_length=30, choices=Roles)
+    tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
+    publish = models.BooleanField(default=True)
+    primary = models.BooleanField(default=False, help_text="Primary com=ntact for this Tower?")
+    person = models.ForeignKey(ContactPerson, blank=True, null=True, on_delete=models.PROTECT)
+    email = models.EmailField(max_length=100, blank=True, help_text="Contact email address")
+    form = models.URLField(blank=True, help_text="Link to a contact form")
+    history = HistoricalRecords()
+
+    class Meta:
+        ordering = ["tower", "person__name", "person__forename", "person__title"]
+        constraints = [
+            models.UniqueConstraint(fields=["tower"], condition=Q(primary=True), name="unique_tower_primary",
+                violation_error_message="Towers can only have a single primary contact")
+        ]
+
+    def __str__(self):
+        return f'{self.tower} {self.get_role_display()}'
+
+    @property
+    def as_links(self):
+        fragments = []
+        if self.person.full_name:
+            fragments.append(self.person.full_name)
+        if self.person.personal_phone:
+            fragments.append(self.person.personal_phone)
+        if self.person.personal_phone2:
+            fragments.append(self.person.personal_phone2)
+        if self.email:
+            fragments.append(f'<a href="mailto:{self.email}">{self.email}</a>')
+        elif self.person.personal_email:
+            fragments.append(f'<a href="mailto:{self.person.personal_email}">{self.person.personal_email}</a>')
+        if self.form:
+            fragments.append(f'<a href="{self.form}">Contact form</a>')
+        return mark_safe(' / '.join(fragments))
 
 
 class Website(models.Model):
@@ -287,11 +340,15 @@ class Website(models.Model):
     website = models.URLField()
     history = HistoricalRecords()
 
-    def __str__(self):
-        return f'{self.website}  ({self.tower})'
-
     class Meta:
-        ordering = ["website"]
+        ordering = ["tower", "website"]
+        constraints = [
+            models.UniqueConstraint(fields=["tower", "website"], name="unique_tower_website",
+                violation_error_message="Can't have the same website more than once for the same tower")
+        ]
+
+    def __str__(self):
+        return f'{self.tower} {self.website}'
 
 
 class Photo(models.Model):
@@ -300,6 +357,10 @@ class Photo(models.Model):
     photo = models.ImageField(blank=True, upload_to="tower_database/photo/photo", height_field="photo_height", width_field="photo_width")
     photo_height = models.SmallIntegerField(blank=True, null=True, editable=False)
     photo_width = models.SmallIntegerField(blank=True, null=True, editable=False)
+    history = HistoricalRecords()
+
+    class Meta:
+        ordering = ["tower", "photo_height"]
 
     def __str__(self):
         return f'{self.tower} ({self.photo_height}x{self.photo_width})'
@@ -308,43 +369,8 @@ class Photo(models.Model):
         return mark_safe(f'<img src="{escape(self.photo.url)}" height="{min(self.photo.height, 200)}">')
     photo_tag.short_description = 'Image'
 
-    class Meta:
-        ordering = ["tower"]
-
-
-class ContactMap(models.Model):
-
-    class Roles(models.TextChoices):
-        OTHER_GENERAL_CONTACT = 'C'
-        OTHER_BELLS_CONTACT = 'BL'
-        OTHER_BAND_CONTACT = 'BA'
-        TOWER_CAPTAIN = 'TC'
-        RINGING_MASTER = 'RM'
-        STEEPLEKEEPER = 'SK'
-
-    role = models.CharField(max_length=30, choices=Roles)
-    tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
-    contact = models.ForeignKey(Contact, on_delete=models.CASCADE)
-    publish = models.BooleanField(default=True)
-    history = HistoricalRecords()
-
-    def __str__(self):
-        return f'{self.get_role_display()} - {self.tower} - {self.contact}'
-
-    class Meta:
-        '''
-        # Throws AttributeError: 'list' object has no attribute 'clone' ???
-        constraints = [
-            models.UniqueConstraint(
-                fields=["tower", "contact"], name="unique_person_group"
-            )
-        ],
-        '''
-        #unique_together = ['tower', 'contact']
-        ordering = ["tower", "role"]
 
 # Auto-generated with ./manage.py inspectdb
-
 class DoveTower(models.Model):
     towerid = models.CharField(db_column='TowerID', blank=True, null=True)  # Field name made lowercase.
     ringid = models.CharField(db_column='RingID', primary_key=True)  # Field name made lowercase.
@@ -395,11 +421,10 @@ class DoveTower(models.Model):
     snlat = models.CharField(db_column='SNLat', blank=True, null=True)  # Field name made lowercase.
     snlong = models.CharField(db_column='SNLong', blank=True, null=True)  # Field name made lowercase.
 
-    def __str__(self):
-        return f'{self.place}  ({self.dedicn})'
-
-
     class Meta:
         managed = False
         db_table = 'dove_towers'
         ordering = ["place", "dedicn"]
+
+    def __str__(self):
+        return f'{self.place}  ({self.dedicn})'
