@@ -10,7 +10,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 
-from .models import ContactPerson, Contact, Tower, Photo, Website, DoveTower
+from .models import ContactPerson, Contact, Tower, Photo, Website, Dove
 
 from position_widget.widgets import PositionInput
 
