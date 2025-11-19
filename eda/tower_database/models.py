@@ -432,10 +432,7 @@ class Dove(models.Model):
         managed = False
         db_table = 'dove_towers'
         ordering = ["place", "dedicn"]
-<<<<<<< HEAD
-        verbose_name = 'Dove Record'
-=======
 
     def __str__(self):
         return f'{self.place}  ({self.dedicn})'
->>>>>>> rework-contacts
+
