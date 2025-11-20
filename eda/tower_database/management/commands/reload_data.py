@@ -177,7 +177,6 @@ class Command(BaseCommand):
                         new_row.contact_set.create(role=role, publish=publish, primary=True, email=csv_row['Email'])
 
 
-                # Add website
-
-                if csv_row['Website']:
-                    new_row.website_set.create(website=csv_row['Website'])
+                # Add website, unless it points to Dove
+                if csv_row['Website'] and "dove.cccbr.org.uk" not in csv_row['Website']:
+                    new_row.website_set.create(website=csv_row['Website'], link_text="District website")

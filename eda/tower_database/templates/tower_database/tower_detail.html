@@ -110,13 +110,19 @@
     	<td class="fw-bold">Websites</td>
     	<td>
     	{% for website in tower.website_set.all %}
+    	{% if website.link_text %}
+    	<a href="{{ website.website }}">{{ website.link_text }}</a><br>
+    	{% else %}
     	<a href="{{ website.website }}">{{ website.website }}</a><br>
+    	{% endif %}
     	{% endfor %}
-        </td>
-    </tr>
-    <tr>
-		<td class="fw-bold">Other links</td>
-		<td><a href="{{ tower.dove_link }}">Dove</a> <a href="{{ tower.bellboard_link }}">BellBoard</a>  <a href="{{ tower.felstead_link }}">Felsted database</a></td>
+    	{% if tower.dove_link %}
+		<a href="{{ tower.dove_link }}">Dove</a><br>
+		<a href="{{ tower.bellboard_link }}">BellBoard</a><br>
+		{% endif %}
+        {% if tower.felstead_link %}
+        <a href="{{ tower.felstead_link }}">Felsted database</a><br>
+        {% endif %}
 	</tr>
 	<tr>
 		<td class="fw-bold">EDA peals</td>

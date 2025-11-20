@@ -271,12 +271,6 @@ class ContactPerson(models.Model):
                 violation_error_message="Contact Person details can't be entirely blank"
             ),
         ]
-        permissions = [
-            ('admin_cambridge', 'Can admin Cambridge towers'),
-            ('admin_ely', 'Can admin Ely towers'),
-            ('admin_huntingdon', 'Can admin Huntingdon towers'),
-            ('admin_wisbech', 'Can admin Wisbech towers')
-        ]
 
     def __str__(self):
         if self.full_name:
@@ -343,6 +337,7 @@ class Contact(models.Model):
 class Website(models.Model):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
+    link_text = models.CharField(max_length=50, blank=True, help_text="Short link text for this website")
     website = models.URLField()
     history = HistoricalRecords()
 
@@ -371,9 +366,9 @@ class Photo(models.Model):
     def __str__(self):
         return f'{self.tower} ({self.photo_height}x{self.photo_width})'
 
+    @property
     def photo_tag(self):
         return mark_safe(f'<img src="{escape(self.photo.url)}" height="{min(self.photo.height, 200)}">')
-    photo_tag.short_description = 'Image'
 
 
 # Auto-generated with ./manage.py inspectdb

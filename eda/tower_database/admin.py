@@ -39,18 +39,37 @@ class WebsiteInline(admin.TabularInline):
 
 class PhotoInline(admin.StackedInline):
     model = Photo
+    fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
+    readonly_fields = ["photo_height", "photo_width", "photo_tag"]
     extra = 0
     #classes = ["collapse"]
 
 class PhotoAdmin(SimpleHistoryAdmin):
     fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
-    list_display = ["tower", "photo_tag"]
+    readonly_fields = ["photo_height", "photo_width", "photo_tag"]
+    list_display = ["tower", "photo_height", "photo_width", "photo_tag"]
+
+    def has_change_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
 
 class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    search_fields = ["website"]
-    search_help_text = "Search by website address"
-    fields = ["tower", "website"]
-    list_display = ["tower", "website"]
+    search_fields = ["website", "target"]
+    search_help_text = "Search by website address or link text"
+    fields = ["tower", "link_text", "website"]
+    list_display = ["tower", "link_text", "website"]
+
+    def has_change_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
 
 class ContactPersonAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     search_fields = ["forename", "name", "personal_phone", "personal_phone2", "personal_email"]
@@ -61,6 +80,14 @@ class ContactPersonAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     list_display = ["tower", "role", "person", "email", "form"]
     readonly_fields = ["tower"]
+
+    def has_change_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
 
 class MyTowerAdminForm(ModelForm):
     class Meta:
