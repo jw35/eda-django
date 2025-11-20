@@ -57,6 +57,14 @@ class PhotoAdmin(SimpleHistoryAdmin):
         else:
             return super().has_change_permission(request, obj)
 
+    def has_delete_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_delete_permission(request, obj)
+
 class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     search_fields = ["website", "target"]
     search_help_text = "Search by website address or link text"
@@ -70,6 +78,14 @@ class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
             return True
         else:
             return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_delete_permission(request, obj)
 
 class ContactPersonAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     search_fields = ["forename", "name", "personal_phone", "personal_phone2", "personal_email"]
@@ -88,6 +104,14 @@ class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
             return True
         else:
             return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_delete_permission(request, obj)
 
 class MyTowerAdminForm(ModelForm):
     class Meta:
