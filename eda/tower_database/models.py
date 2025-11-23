@@ -8,7 +8,9 @@ from django.utils.safestring import mark_safe
 from multiselectfield import MultiSelectField
 from simple_history.models import HistoricalRecords
 
+import os.path
 import re
+import uuid
 
 from collections import defaultdict
 
@@ -352,10 +354,16 @@ class Website(models.Model):
         return f'{self.tower} {self.website}'
 
 
+def rename_image(instance, filename):
+    suffix = (os.path.splitext(filename)[1]).lower()
+    tower = re.sub(' ', '_',f"{instance.tower.place}_{instance.tower.dedication}").lower()
+    tower = re.sub(r'[^a-z_]+', '', tower)
+    return f"tower_database/photo/{tower}_{uuid.uuid4()}{suffix}"
+
 class Photo(models.Model):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
-    photo = models.ImageField(blank=True, upload_to="tower_database/photo/photo", height_field="photo_height", width_field="photo_width")
+    photo = models.ImageField(blank=True, upload_to=rename_image, height_field="photo_height", width_field="photo_width")
     photo_height = models.SmallIntegerField(blank=True, null=True, editable=False)
     photo_width = models.SmallIntegerField(blank=True, null=True, editable=False)
     history = HistoricalRecords()
