@@ -2,6 +2,8 @@ from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 from django.forms import ModelForm
 
+from simple_history.utils import update_change_reason
+
 from tower_database.models import Tower, Contact, ContactPerson, Website, Photo
 import requests
 import csv
@@ -139,6 +141,7 @@ class Command(BaseCommand):
             else:
 
                 new_row = f.save()
+                update_change_reason(new_row, "Initial data load")
 
                 # Add contact(s)
 
@@ -168,15 +171,20 @@ class Command(BaseCommand):
                             name = csv_row['Secretary']
 
                         (contact_person, created) = ContactPerson.objects.get_or_create(title=title, forename=forename, name=name, personal_phone=csv_row['Phone'], personal_email=csv_row['Email'])
+                        if created:
+                            update_change_reason(contact_person, "Initial data load")
 
-                        new_row.contact_set.create(role=role, publish=publish, primary=True, person=contact_person)
+                        contact = new_row.contact_set.create(role=role, publish=publish, primary=True, person=contact_person)
+                        update_change_reason(contact, "Initial data load")
 
                     # Otherwise, just add a new Contact
                     else:
 
                         new_row.contact_set.create(role=role, publish=publish, primary=True, email=csv_row['Email'])
+                        update_change_reason(contact, "Initial data load")
 
 
                 # Add website, unless it points to Dove
                 if csv_row['Website'] and "dove.cccbr.org.uk" not in csv_row['Website']:
-                    new_row.website_set.create(website=csv_row['Website'], link_text="District website")
+                    website = new_row.website_set.create(website=csv_row['Website'], link_text="District website")
+                    update_change_reason(website, "Initial data load")

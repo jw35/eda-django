@@ -18,9 +18,12 @@ admin.site.site_header = "Ely DA Admin"
 admin.site.site_title = "Database admin"
 admin.site.index_title = "Database admin"
 
+### INLINES
+
 class ContactPersonInline(admin.TabularInline):
     model = ContactPerson
     extra = 0
+
 
 class ContactInlineForPerson(admin.TabularInline):
     model = Contact
@@ -28,14 +31,17 @@ class ContactInlineForPerson(admin.TabularInline):
     readonly_fields = ["role", "tower", "publish", "primary"]
     extra = 0
 
+
 class ContactInline(admin.TabularInline):
     model = Contact
     extra = 0
+
 
 class WebsiteInline(admin.TabularInline):
     model = Website
     extra = 0
     #classes = ["collapse"]
+
 
 class PhotoInline(admin.StackedInline):
     model = Photo
@@ -44,74 +50,7 @@ class PhotoInline(admin.StackedInline):
     extra = 0
     #classes = ["collapse"]
 
-class PhotoAdmin(SimpleHistoryAdmin):
-    fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
-    readonly_fields = ["photo_height", "photo_width", "photo_tag"]
-    list_display = ["tower", "photo_height", "photo_width", "photo_tag"]
-
-    def has_change_permission(self, request, obj=None):
-        if obj == None:
-            return True
-        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
-            return True
-        else:
-            return super().has_change_permission(request, obj)
-
-    def has_delete_permission(self, request, obj=None):
-        if obj == None:
-            return True
-        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
-            return True
-        else:
-            return super().has_delete_permission(request, obj)
-
-class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    search_fields = ["website", "target"]
-    search_help_text = "Search by website address or link text"
-    fields = ["tower", "link_text", "website"]
-    list_display = ["tower", "link_text", "website"]
-
-    def has_change_permission(self, request, obj=None):
-        if obj == None:
-            return True
-        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
-            return True
-        else:
-            return super().has_change_permission(request, obj)
-
-    def has_delete_permission(self, request, obj=None):
-        if obj == None:
-            return True
-        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
-            return True
-        else:
-            return super().has_delete_permission(request, obj)
-
-class ContactPersonAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    search_fields = ["forename", "name", "personal_phone", "personal_phone2", "personal_email"]
-    search_help_text = "Search by name, phone number or email"
-    list_display = ["name", "title", "forename", "personal_phone", "personal_phone2", "personal_email"]
-    inlines = [ContactInlineForPerson]
-
-class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    list_display = ["tower", "role", "person", "email", "form"]
-    readonly_fields = ["tower"]
-
-    def has_change_permission(self, request, obj=None):
-        if obj == None:
-            return True
-        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
-            return True
-        else:
-            return super().has_change_permission(request, obj)
-
-    def has_delete_permission(self, request, obj=None):
-        if obj == None:
-            return True
-        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
-            return True
-        else:
-            return super().has_delete_permission(request, obj)
+### ADMINS
 
 class MyTowerAdminForm(ModelForm):
     class Meta:
@@ -218,6 +157,89 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
             }
         )
     ]
+
+
+class ContactPersonAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
+    search_fields = ["forename", "name", "personal_phone", "personal_phone2", "personal_email"]
+    search_help_text = "Search by name, phone number or email"
+    list_display = ["name", "title", "forename", "personal_phone", "personal_phone2", "personal_email"]
+    inlines = [ContactInlineForPerson]
+
+
+class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
+    list_display = ["tower", "role", "person", "email", "form"]
+    readonly_fields = ["tower"]
+
+    def has_change_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
+
+    def has_create_permission(self, request):
+        if request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_create_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_delete_permission(request, obj)
+
+
+class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
+    search_fields = ["website", "target"]
+    search_help_text = "Search by website address or link text"
+    fields = ["tower", "link_text", "website"]
+    list_display = ["tower", "link_text", "website"]
+
+    def has_change_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
+
+    def has_create_permission(self, request):
+        if request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_create_permission(request)
+
+    def has_delete_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_delete_permission(request, obj)
+
+
+class PhotoAdmin(SimpleHistoryAdmin):
+    fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
+    readonly_fields = ["photo_height", "photo_width", "photo_tag"]
+    list_display = ["tower", "photo_height", "photo_width", "photo_tag"]
+
+    def has_change_permission(self, request, obj=None):
+        if obj == None:
+            return True
+        elif request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
+
+    def has_create_permission(self, request):
+        if request.user.has_perm(f"{self.opts.app_label}.admin_{obj.tower.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_create_permission(request)
 
 class DoveAdmin(SearchAutoCompleteAdmin):
     search_fields = ["place", "dedicn", "towerid", "ringid"]

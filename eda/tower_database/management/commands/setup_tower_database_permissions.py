@@ -15,7 +15,7 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        # Custom permission labels
+        # Create custom permission labels
         permissions = [
             ('admin_cambridge', 'Can admin Cambridge towers'),
             ('admin_ely', 'Can admin Ely towers'),
@@ -42,6 +42,8 @@ class Command(BaseCommand):
                  'add_website', 'change_website', 'delete_website', 'view_website'
                  )
 
+        district_admin_permissions = ('add_contactperson', 'change_contactperson', 'view_contactperson')
+
         # Get all existing permissions
         all_permissions = Permission.objects.filter(content_type__app_label='tower_database')
 
@@ -66,8 +68,7 @@ class Command(BaseCommand):
             for perm in all_permissions:
                 if (perm.codename == f'admin_{district.lower()}'
                     or perm.codename in ro_permissions
-                    or perm.codename == 'add_contactperson'
-                    or perm.codename == 'change_contactperson'):
+                    or perm.codename in district_admin_permissions):
                      group.permissions.add(perm)
 
 

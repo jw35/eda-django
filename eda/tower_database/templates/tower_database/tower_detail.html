@@ -157,6 +157,26 @@
 <p>{{ photo.photo_tag }}</p>
 {% endfor %}
 
+<h2>Edit history</h2>
+
+<table class="table table-responsive table-sm">
+
+	<tr>
+		<td>Date</td>
+		<td>Who</td>
+		<td>Type</td>
+		<td>Reason</td>
+	</tr>
+    {% for h in tower.history.all %}
+    <tr>
+    	<td>{{ h.history_date }}</td>
+    	<td>{{ h.history_user }}</td>
+    	<td>{{ h.get_history_type_display }}</td>
+    	<td>{{ h.history_change_reason }}</td>
+    </tr>
+    {% endfor %}
+</table>
+
 {% if user.is_superuser %}
 <p>[Admin only: <a href="{% url 'admin:tower_database_tower_change' tower.pk %}">Edit</a>]</p>
 {% endif %}
