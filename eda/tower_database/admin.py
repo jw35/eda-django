@@ -36,11 +36,46 @@ class ContactInline(admin.TabularInline):
     model = Contact
     extra = 0
 
+    def has_add_permission(self, request, obj):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_add_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_delete_permission(request, obj)
+
 
 class WebsiteInline(admin.TabularInline):
     model = Website
     extra = 0
-    #classes = ["collapse"]
+
+    def has_add_permission(self, request, obj):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_add_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_delete_permission(request, obj)
 
 
 class PhotoInline(admin.StackedInline):
@@ -48,7 +83,24 @@ class PhotoInline(admin.StackedInline):
     fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
     readonly_fields = ["photo_height", "photo_width", "photo_tag"]
     extra = 0
-    #classes = ["collapse"]
+
+    def has_add_permission(self, request, obj):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_add_permission(request, obj)
+
+    def has_change_permission(self, request, obj=None):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_change_permission(request, obj)
+
+    def has_delete_permission(self, request, obj=None):
+        if object and request.user.has_perm(f"{self.opts.app_label}.admin_{obj.get_district_display().lower()}"):
+            return True
+        else:
+            return super().has_delete_permission(request, obj)
 
 ### ADMINS
 

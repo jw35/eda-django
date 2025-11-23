@@ -34,7 +34,7 @@ class Command(BaseCommand):
         # Sets of permissions to allocate
         ro_permissions = ('view_contact' , 'view_contactperson', 'view_dove', 'view_photo', 'view_tower','view_website')
 
-        admin_permissions = ('add_contact', 'change_contact', 'delete_contact', 'view_contact',
+        admin_permissions = ('add_contact', 'change_contact', 'view_contact',
                  'add_contactperson', 'change_contactperson', 'delete_contactperson', 'view_contactperson',
                  'view_dove',
                  'add_photo', 'change_photo', 'delete_photo', 'view_photo',
