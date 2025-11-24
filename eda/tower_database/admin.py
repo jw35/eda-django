@@ -80,8 +80,8 @@ class WebsiteInline(admin.TabularInline):
 
 class PhotoInline(admin.StackedInline):
     model = Photo
-    fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
-    readonly_fields = ["photo_height", "photo_width", "photo_tag"]
+    fields = ["tower", "photo", "img_tag", "height", "width"]
+    readonly_fields = ["height", "width", "img_tag"]
     extra = 0
 
     def has_add_permission(self, request, obj):
@@ -275,9 +275,9 @@ class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 
 
 class PhotoAdmin(SimpleHistoryAdmin):
-    fields = ["tower", "photo", "photo_tag", "photo_height", "photo_width"]
-    readonly_fields = ["photo_height", "photo_width", "photo_tag"]
-    list_display = ["tower", "photo_height", "photo_width", "photo_tag"]
+    fields = ["tower", "photo", "img_tag", "height", "width"]
+    readonly_fields = ["height", "width", "img_tag"]
+    list_display = ["tower", "height", "width", "img_tag"]
 
     def has_change_permission(self, request, obj=None):
         if obj == None:

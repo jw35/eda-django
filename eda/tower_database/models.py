@@ -363,19 +363,20 @@ def rename_image(instance, filename):
 class Photo(models.Model):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
-    photo = models.ImageField(blank=True, upload_to=rename_image, height_field="photo_height", width_field="photo_width")
-    photo_height = models.SmallIntegerField(blank=True, null=True, editable=False)
-    photo_width = models.SmallIntegerField(blank=True, null=True, editable=False)
+    photo = models.ImageField(upload_to=rename_image, height_field="height", width_field="width")
+    height = models.SmallIntegerField(blank=True, null=True, editable=False)
+    width = models.SmallIntegerField(blank=True, null=True, editable=False)
+    credit = models.CharField(max_length=100, blank=True)
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ["tower", "photo_height"]
+        ordering = ["tower", "height"]
 
     def __str__(self):
         return f'{self.tower} ({self.photo_height}x{self.photo_width})'
 
     @property
-    def photo_tag(self):
+    def img_tag(self):
         return mark_safe(f'<img src="{escape(self.photo.url)}" height="{min(self.photo.height, 200)}">')
 
 
@@ -435,6 +436,7 @@ class Dove(models.Model):
         managed = False
         db_table = 'dove_towers'
         ordering = ["place", "dedicn"]
+        verbose_name = 'dove record'
 
     def __str__(self):
         return f'{self.place}  ({self.dedicn})'

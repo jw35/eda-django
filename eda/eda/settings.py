@@ -47,6 +47,7 @@ INSTALLED_APPS = [
     'eda',
     'tower_database',
     'position_widget',
+    'django_cleanup',
 ]
 
 AUTH_USER_MODEL = 'custom_user.User'
