@@ -80,7 +80,7 @@ class WebsiteInline(admin.TabularInline):
 
 class PhotoInline(admin.StackedInline):
     model = Photo
-    fields = ["tower", "photo", "img_tag", "height", "width"]
+    fields = ["tower", "image", "img_tag", "height", "width"]
     readonly_fields = ["height", "width", "img_tag"]
     extra = 0
 
@@ -108,7 +108,7 @@ class MyTowerAdminForm(ModelForm):
     class Meta:
         model = Tower
         widgets = {
-            'position': PositionInput(height=300, lat1=52.75959, lng1=-0.46869, lat2=52.07286, lng2=0.58795)
+            'latlng': PositionInput(height=300, lat1=52.75959, lng1=-0.46869, lat2=52.07286, lng2=0.58795)
         }
         fields = '__all__' # required for Django 3.x
 
@@ -189,7 +189,7 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
                     "postcode",
                     "lat",
                     "lng",
-                    "position",
+                    "latlng",
                 )
             }
         ),
@@ -246,10 +246,10 @@ class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 
 
 class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    search_fields = ["website", "target"]
+    search_fields = ["url", "target"]
     search_help_text = "Search by website address or link text"
-    fields = ["tower", "link_text", "website"]
-    list_display = ["tower", "link_text", "website"]
+    fields = ["tower", "link_text", "url"]
+    list_display = ["tower", "link_text", "url"]
 
     def has_change_permission(self, request, obj=None):
         if obj == None:
@@ -275,7 +275,7 @@ class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 
 
 class PhotoAdmin(SimpleHistoryAdmin):
-    fields = ["tower", "photo", "img_tag", "height", "width"]
+    fields = ["tower", "image", "img_tag", "height", "width"]
     readonly_fields = ["height", "width", "img_tag"]
     list_display = ["tower", "height", "width", "img_tag"]
 

@@ -125,7 +125,7 @@ class Command(BaseCommand):
             db_row['lat'] = round(float(csv_row['Lat']), 5)
             db_row['lng'] = round(float(csv_row['Lng']), 5)
 
-            db_row['position'] = f"{ round(float(csv_row['Lat']), 5) },{ round(float(csv_row['Lng']), 5) }"
+            db_row['latlng'] = f"{ round(float(csv_row['Lat']), 5) },{ round(float(csv_row['Lng']), 5) }"
 
             # Load the dictionary into an instance for the form and validate it
             f = TowerForm(db_row)
@@ -186,5 +186,5 @@ class Command(BaseCommand):
 
                 # Add website, unless it points to Dove
                 if csv_row['Website'] and "dove.cccbr.org.uk" not in csv_row['Website']:
-                    website = new_row.website_set.create(website=csv_row['Website'], link_text="District website")
+                    website = new_row.website_set.create(url=csv_row['Website'], link_text="District website")
                     update_change_reason(website, "Initial data load")

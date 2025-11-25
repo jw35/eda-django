@@ -160,7 +160,7 @@ class Tower(models.Model):
     postcode = models.CharField(max_length=10, blank=True, validators=[postcode_validator])
     lat = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
     lng = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
-    position = models.CharField(max_length=20, blank=True)
+    latlng = models.CharField(max_length=20, blank=True)
     peals = models.PositiveIntegerField(null=True , blank=True, help_text="Peals in most recent Annual Report")
     dove_towerid = models.CharField(max_length=10, blank=True, verbose_name="Dove TowerID")
     dove_ringid = models.CharField(max_length=10, blank=True, verbose_name="Dove RingID")
@@ -340,13 +340,13 @@ class Website(models.Model):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
     link_text = models.CharField(max_length=50, blank=True, help_text="Short link text for this website")
-    website = models.URLField()
+    url = models.URLField()
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ["tower", "website"]
+        ordering = ["tower", "url"]
         constraints = [
-            models.UniqueConstraint(fields=["tower", "website"], name="unique_tower_website",
+            models.UniqueConstraint(fields=["tower", "url"], name="unique_tower_url",
                 violation_error_message="Can't have the same website more than once for the same tower")
         ]
 
@@ -363,7 +363,7 @@ def rename_image(instance, filename):
 class Photo(models.Model):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
-    photo = models.ImageField(upload_to=rename_image, height_field="height", width_field="width")
+    image = models.ImageField(upload_to=rename_image, height_field="height", width_field="width")
     height = models.SmallIntegerField(blank=True, null=True, editable=False)
     width = models.SmallIntegerField(blank=True, null=True, editable=False)
     credit = models.CharField(max_length=100, blank=True)
@@ -373,11 +373,11 @@ class Photo(models.Model):
         ordering = ["tower", "height"]
 
     def __str__(self):
-        return f'{self.tower} ({self.photo_height}x{self.photo_width})'
+        return f'{self.tower} ({self.height}x{self.width})'
 
     @property
     def img_tag(self):
-        return mark_safe(f'<img src="{escape(self.photo.url)}" height="{min(self.photo.height, 200)}">')
+        return mark_safe(f'<img src="{escape(self.image.url)}" height="{min(self.image.height, 200)}">')
 
 
 # Auto-generated with ./manage.py inspectdb

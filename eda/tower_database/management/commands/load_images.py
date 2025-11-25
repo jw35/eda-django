@@ -36,18 +36,18 @@ class Command(BaseCommand):
 
             image_url = None
 
-            if re.search(r'cambridgeringing\.info', site.website):
+            if re.search(r'cambridgeringing\.info', site.url):
 
-                r = requests.get(site.website)
+                r = requests.get(site.url)
                 soup = BeautifulSoup(r.content, 'html.parser')
 
                 # <td width='35%' align='center'><img src='balsham.jpg' alt='Balsham Tower' width='223' height='320'></td></tr>
 
-                image_url = urljoin(site.website, soup.img.get('src'))
+                image_url = urljoin(site.url, soup.img.get('src'))
 
-            elif re.search(r'huntbells\.org\.uk', site.website):
+            elif re.search(r'huntbells\.org\.uk', site.url):
 
-                r = requests.get(site.website)
+                r = requests.get(site.url)
                 soup = BeautifulSoup(r.content, 'html.parser')
 
                 # <figure class="wp-block-image size-large"><img fetchpriority="high" decoding="async" width="1024" height="576" src="https://huntbells.org.uk/wp-content/uploads/Bluntisham-1-1024x576.jpg" alt="" class="wp-image-1397" srcset="https://huntbells.org.uk/wp-content/uploads/Bluntisham-1-1024x576.jpg 1024w, https://huntbells.org.uk/wp-content/uploads/Bluntisham-1-300x169.jpg 300w, https://huntbells.org.uk/wp-content/uploads/Bluntisham-1-768x432.jpg 768w, https://huntbells.org.uk/wp-content/uploads/Bluntisham-1-1536x864.jpg 1536w, https://huntbells.org.uk/wp-content/uploads/Bluntisham-1-2048x1152.jpg 2048w, https://huntbells.org.uk/wp-content/uploads/Bluntisham-1-1920x1080.jpg 1920w" sizes="(max-width: 1024px) 100vw, 1024px" /></figure>
@@ -70,7 +70,7 @@ class Command(BaseCommand):
                 '''
 
                 photo = site.tower.photo_set.create()
-                photo.photo.save(
+                photo.image.save(
                     os.path.basename(image_url),
                     File(open(result[0], 'rb'))
                 )
