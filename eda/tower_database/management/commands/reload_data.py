@@ -122,9 +122,6 @@ class Command(BaseCommand):
             if csv_row['Peals']:
                 db_row['peals'] = int(csv_row['Peals'])
 
-            db_row['lat'] = round(float(csv_row['Lat']), 5)
-            db_row['lng'] = round(float(csv_row['Lng']), 5)
-
             db_row['latlng'] = f"{ round(float(csv_row['Lat']), 5) },{ round(float(csv_row['Lng']), 5) }"
 
             # Load the dictionary into an instance for the form and validate it

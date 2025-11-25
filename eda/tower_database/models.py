@@ -158,9 +158,7 @@ class Tower(models.Model):
     gf = models.BooleanField(blank=True, null=True, verbose_name="Ground Floor?")
     os_grid= models.CharField(max_length=8, blank=True, validators=[grid_validator], verbose_name='OS Grid')
     postcode = models.CharField(max_length=10, blank=True, validators=[postcode_validator])
-    lat = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
-    lng = models.DecimalField(max_digits=8, blank=True, null=True, decimal_places=5)
-    latlng = models.CharField(max_length=20, blank=True)
+    latlng = models.CharField(max_length=20, blank=True, verbose_name='Location')
     peals = models.PositiveIntegerField(null=True , blank=True, help_text="Peals in most recent Annual Report")
     dove_towerid = models.CharField(max_length=10, blank=True, verbose_name="Dove TowerID")
     dove_ringid = models.CharField(max_length=10, blank=True, verbose_name="Dove RingID")
@@ -205,6 +203,15 @@ class Tower(models.Model):
     @property
     def felstead_link(self):
         return f"https://felstead.cccbr.org.uk/tbid.php?tid={self.towerbase_id}"
+
+    @property
+    def lat(self):
+        return float(self.latlng.split(',')[0])
+
+    @property
+    def lng(self):
+        return float(self.latlng.split(',')[1])
+
 
     def clean(self):
 
@@ -351,7 +358,7 @@ class Website(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.tower} {self.website}'
+        return f'{self.tower} {self.url}'
 
 
 def rename_image(instance, filename):

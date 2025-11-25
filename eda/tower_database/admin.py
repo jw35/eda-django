@@ -187,8 +187,6 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
                 "fields": (
                     "os_grid",
                     "postcode",
-                    "lat",
-                    "lng",
                     "latlng",
                 )
             }
