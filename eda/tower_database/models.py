@@ -7,6 +7,7 @@ from django.utils.safestring import mark_safe
 
 from multiselectfield import MultiSelectField
 from simple_history.models import HistoricalRecords
+from OSGridConverter import latlong2grid
 
 import os.path
 import re
@@ -146,8 +147,8 @@ class Tower(models.Model):
     include_dedication = models.BooleanField(default=False, help_text="For places with more than one tower [Cambridge], or for towers in different places that have the same name [Chesterton])")
     ringing_status = models.CharField(max_length=20, blank=True, choices=RingingStatus, help_text="Full-circle ringing status")
     report = models.BooleanField(default=False, verbose_name="In annual report?")
-    service = models.CharField(max_length=200, blank=True, validators=[time_validator, initial_capital_validator], help_text="Short description of normal service ringing. No initial capital (unless day of week)")
-    practice = models.CharField(max_length=200, blank=True, validators=[time_validator, initial_capital_validator], help_text="Short description of normal practice ringing. No initial capital (unless day of week)")
+    service = models.CharField(max_length=200, blank=True, validators=[time_validator], help_text="Short description of normal service ringing. No initial capital (unless day of week)")
+    practice = models.CharField(max_length=200, blank=True, validators=[time_validator], help_text="Short description of normal practice ringing. No initial capital (unless day of week)")
     practice_day = models.CharField(max_length=9, blank=True, choices=Days, help_text="Day of the week of main practice")
     practice_weeks = MultiSelectField(max_length=50, blank=True, choices=PracticeWeeks, validators=[week_validator], help_text="Week(s) of the month for main practice if not all")
     travel_check = models.BooleanField(default=False, help_text="Check before travelling to practices?")
@@ -156,7 +157,6 @@ class Tower(models.Model):
     weight =models.CharField(max_length=50, blank=True, validators=[weight_validator], help_text="Use ‘15-3-13’ or ‘6cwt’")
     note = models.CharField(max_length=10, blank=True, validators=[note_validator], help_text="Use A-G optionally followed by '#' or ‘b’")
     gf = models.BooleanField(blank=True, null=True, verbose_name="Ground Floor?")
-    os_grid= models.CharField(max_length=8, blank=True, validators=[grid_validator], verbose_name='OS Grid')
     postcode = models.CharField(max_length=10, blank=True, validators=[postcode_validator])
     latlng = models.CharField(max_length=20, blank=True, verbose_name='Location')
     peals = models.PositiveIntegerField(null=True , blank=True, help_text="Peals in most recent Annual Report")
@@ -176,7 +176,7 @@ class Tower(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.place}  ({self.dedication})'
+        return f'{self.place} - {self.dedication}'
 
     def get_absolute_url(self):
         return reverse("tower_detail", kwargs={"pk": self.pk})
@@ -212,6 +212,10 @@ class Tower(models.Model):
     def lng(self):
         return float(self.latlng.split(',')[1])
 
+    @property
+    def os_grid(self):
+        g = str(latlong2grid(self.lat, self.lng))
+        return g[0:2] + g[3:6] + g[9:12]
 
     def clean(self):
 

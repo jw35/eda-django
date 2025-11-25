@@ -21,7 +21,6 @@ easy_fields = (
     ('Bells', 'bells'),
     ('Weight', 'weight'),
     ('Note', 'note'),
-    ('OS grid', 'os_grid'),
     ('Postcode', 'postcode'),
     ('Dove Tower ID', 'dove_towerid'),
     ('Dove Ring ID', 'dove_ringid'),

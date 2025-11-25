@@ -77,16 +77,16 @@
 		<td>{{ tower.gf|yesno|capfirst }}</td>
 	</tr>
 	<tr>
-		<td class="fw-bold">OS Grid</td>
-		<td>{{ tower.os_grid }}</td>
-	</tr>
-	<tr>
 		<td class="fw-bold">PostCode</td>
 		<td>{{ tower.postcode }}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">Latitide, Longitude</td>
 		<td>{{ tower.lat }}, {{ tower.lng }} (<a href="https://www.google.com/maps/search/?api=1&query={{ tower.lat }},{{ tower.lng }}">Google</a>, <a href="https://www.openstreetmap.org/?mlat={{ tower.lat}}&mlon={{ tower.lng }}&zoom=16">OpenStreetMap</a>)</td>
+	</tr>
+	<tr>
+		<td class="fw-bold">OS Grid</td>
+		<td>{{ tower.os_grid }}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">Primary contact</td>
