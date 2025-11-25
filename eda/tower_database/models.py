@@ -216,6 +216,7 @@ class Tower(models.Model):
     def os_grid(self):
         g = str(latlong2grid(self.lat, self.lng))
         return g[0:2] + g[3:6] + g[9:12]
+    os_grid.fget.short_description = "OS Grid"
 
     def clean(self):
 
