@@ -370,7 +370,7 @@ def rename_image(instance, filename):
     suffix = (os.path.splitext(filename)[1]).lower()
     tower = re.sub(' ', '_',f"{instance.tower.place}_{instance.tower.dedication}").lower()
     tower = re.sub(r'[^a-z_]+', '', tower)
-    return f"tower_database/photo/{tower}_{uuid.uuid4()}{suffix}"
+    return f"towers/{tower}_{uuid.uuid4()}{suffix}"
 
 class Photo(models.Model):
 
