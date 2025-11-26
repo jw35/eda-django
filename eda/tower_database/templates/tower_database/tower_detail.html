@@ -88,6 +88,7 @@
 		{% endif %}
 	    </td>
 	</tr>
+	{% if tower.other_contacts %}
 	<tr>
 		<td class="fw-bold">Other contacts</td>
 		<td>
@@ -98,6 +99,7 @@
 		{% endfor %}
 	    </td>
 	</tr>
+	{% endif %}
     <tr>
     	<td class="fw-bold">Websites</td>
     	<td>
@@ -118,7 +120,13 @@
 	</tr>
 	<tr>
 		<td class="fw-bold">EDA peals</td>
-		<td>{{ tower.peals }}</td>
+		<td>
+		{% if tower.peals %}
+		{{ tower.peals }}
+		{% else %}
+		None
+		{% endif %}
+	    </td>
 	</tr>
 	<tr>
 		<td class="fw-bold">In EDA Annual Report</td>
@@ -136,10 +144,12 @@
 		<td class="fw-bold">Notes</td>
 		<td>{{ tower.notes }}</td>
 	</tr>
+	{% if tower.long_notes %}
     <tr>
 		<td class="fw-bold">Longer notes</td>
 		<td>{{ tower.long_notes }}</td>
 	</tr>
+	{% endif %}
 
 </tbody>
 
