@@ -15,6 +15,15 @@
     <script src="{% static 'tower_database/DataTables/datatables.min.js' %}"></script>
     <script>
     $(document).ready( function () {
+        {% if group_by %}
+        orderFixed: [{{ group_by }}, 'asc'],
+        rowGroup: {
+           dataSrc: {{ group_by }}
+        }
+        {% endif %}
+        columnDefs: [
+        ,
+        
         $('#tower_table').DataTable({
             paging: false,
             layout: {
@@ -23,6 +32,13 @@
                 }
             },
             columnDefs: [
+                {% if group_by %}
+                {
+                   target: {{ group_by }},
+                   visible: false,
+                   searchable: false
+                },
+                {% endif %}
                 {
                     searchPanes: {
                         show: false
