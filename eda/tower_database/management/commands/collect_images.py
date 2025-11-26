@@ -1,21 +1,18 @@
-from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
-from django.db import connection
 
-from simple_history.utils import update_change_reason
-
-from tower_database.models import Website, Photo
-
-import requests
-import re
 import os
-
 import shutil
+import re
 
 from urllib.parse import urljoin, urlparse
 
 import requests
 from bs4 import BeautifulSoup
+
+from tower_database.models import Website
+
+
+CACHE_DIR = "../tower_images"
 
 
 class Command(BaseCommand):
@@ -27,8 +24,8 @@ class Command(BaseCommand):
 
     def handle(self, *args, **options):
 
-        shutil.rmtree("../tower_images")
-        os.mkdir("../tower_images")
+        shutil.rmtree(CACHE_DIR)
+        os.mkdir(CACHE_DIR)
 
         for site in Website.objects.all():
 
@@ -62,7 +59,7 @@ class Command(BaseCommand):
                 path = urlparse(image_url).path
                 fname = os.path.basename(path)
 
-                savefile = f"../tower_images/{site.tower.pk}-{fname}"
+                savefile = os.path.join(CACHE_DIR, f"{site.tower.pk}-{fname}")
 
                 print(savefile)
 
@@ -70,4 +67,3 @@ class Command(BaseCommand):
                 with open(savefile, 'wb') as handler:
                     handler.write(img_data)
 
-        print(os.getcwd())

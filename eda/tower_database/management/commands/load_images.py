@@ -2,22 +2,16 @@ from django.core.files import File
 from django.core.management.base import BaseCommand, CommandError
 from django.db import connection
 
-from simple_history.utils import update_change_reason
-
-from tower_database.models import Tower, Photo
-
-import requests
 import re
 import os
 
 from os.path import isfile
 
-from urllib.request import urlretrieve
-from urllib.parse import urljoin
+from simple_history.utils import update_change_reason
 
-import requests
-from bs4 import BeautifulSoup
+from tower_database.models import Tower, Photo
 
+CACHE_DIR = "../tower_images"
 
 class Command(BaseCommand):
     help = 'Load tower photos from files'
@@ -34,26 +28,23 @@ class Command(BaseCommand):
         with connection.cursor() as cursor:
             cursor.execute("delete from sqlite_sequence where name='tower_database_photo';")
 
-        for f in os.listdir("../tower_images"):
+        for f in [f for f in os.listdir(CACHE_DIR) if isfile(os.path.join(CACHE_DIR, f))]:
 
+            match = re.match(r'(\d+)-', f)
+            if match:
 
+                print(f"Processing {f}")
 
-            if isfile("../tower_images/" + f):
+                tower = Tower.objects.get(pk=match.group(1))
 
-                print(f)
+                photo = tower.photo_set.create()
+                photo.image.save(
+                    f,
+                    File(open(os.path.join(CACHE_DIR, f), 'rb'))
+                )
+                photo.save()
 
-                match = re.match(r'(\d+)-', f)
-                if match:
+                update_change_reason(photo, "Image import from websites")
 
-                    print("Got match")
-
-                    tower = Tower.objects.get(pk=match.group(1))
-
-                    photo = tower.photo_set.create()
-                    photo.image.save(
-                        f,
-                        File(open("../tower_images/" + f, 'rb'))
-                    )
-                    photo.save()
-
-                    update_change_reason(photo, "Image import from websites")
+            else:
+                print(f"Ignoring {f}")
