@@ -22,6 +22,7 @@ class DistrictListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = 'Towers by district'
+        context["fancy"]= "yes"
         context["group_by"] = 4
         return context
 
@@ -51,6 +52,7 @@ class BellsListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = 'Towers rung full-circle, by number of bells'
+        context("fancy"] = "yes"
         context["group_by"] = 2
         return context
 
@@ -62,6 +64,7 @@ class UnBellsListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = 'Towers not rung full-circle, by number of bells'
+        context("fancy"] = "yes"
         context["group_by"] = 2
         context["notes"] = ("Towers may not be rung full-circle because the bells are unringable or derelict, "
                            "hung for chiming only, becasue the tower is unsafe, etc.")
