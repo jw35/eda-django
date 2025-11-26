@@ -14,6 +14,15 @@ class TowerListView(ListView):
         context["title"] = 'All towers'
         return context
 
+class TowerListComplexView(ListView):
+    model = Tower
+    template_name = 'tower_database/tower_list_complex.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context["title"] = 'All towers'
+        return context
+
 
 class DistrictListView(ListView):
     model = Tower
