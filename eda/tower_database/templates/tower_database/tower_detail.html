@@ -33,10 +33,6 @@
 	</tr>
 	{% endif %}
 	<tr>
-		<td class="fw-bold">District</td>
-		<td>{{ tower.get_district_display }}</td>
-	</tr>
-	<tr>
 		<td class="fw-bold">Ringing Status</td>
 		<td>{{ tower.get_ringing_status_display }}</td>
 	</tr>
@@ -127,6 +123,10 @@
 		None
 		{% endif %}
 	    </td>
+	</tr>
+	<tr>
+		<td class="fw-bold">EDA District</td>
+		<td>{{ tower.get_district_display }}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">In EDA Annual Report</td>
