@@ -84,8 +84,6 @@ class TowerDetailView(DetailView):
 
     def get_context_data(self, **kwargs):
         admin_group = f'Tower Database admin { self.object.get_district_display() }'
-        print(admin_group)
-        print(self.request.user.groups.all())
         context = super().get_context_data(**kwargs)
         context['user_can_edit'] = (
             self.request.user.is_superuser or
