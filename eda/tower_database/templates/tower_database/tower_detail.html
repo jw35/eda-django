@@ -16,10 +16,6 @@
 
 	<tbody>
 
-	<tr class="text-start">
-		<td class="fw-bold">County</td>
-		<td>{{ tower.get_county_display }}</td>
-	</tr>
 	{% if tower.fulldedication %}
 	<tr>
 		<td class="fw-bold">Full Dedication</td>
@@ -63,6 +59,10 @@
 	<tr>
 		<td class="fw-bold">Ground floor?</td>
 		<td>{{ tower.gf|yesno|capfirst }}</td>
+	</tr>
+	<tr class="text-start">
+		<td class="fw-bold">County</td>
+		<td>{{ tower.get_county_display }}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">PostCode</td>
