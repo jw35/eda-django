@@ -115,6 +115,10 @@
         {% endif %}
 	</tr>
 	<tr>
+		<td class="fw-bold">EDA District</td>
+		<td>{{ tower.get_district_display }}</td>
+	</tr>
+	<tr>
 		<td class="fw-bold">EDA peals</td>
 		<td>
 		{% if tower.peals %}
@@ -125,11 +129,7 @@
 	    </td>
 	</tr>
 	<tr>
-		<td class="fw-bold">EDA District</td>
-		<td>{{ tower.get_district_display }}</td>
-	</tr>
-	<tr>
-		<td class="fw-bold">In EDA Annual Report</td>
+		<td class="fw-bold">In EDA Annual Report?</td>
 		<td>{{ tower.report|yesno|capfirst }}</td>
 	</tr>
 	<tr>
