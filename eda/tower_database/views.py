@@ -12,17 +12,8 @@ class TowerListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = 'All towers'
+        context['fancy'] = "Yes"
         return context
-
-class TowerListComplexView(ListView):
-    model = Tower
-    template_name = 'tower_database/tower_list_complex.html'
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["title"] = 'All towers'
-        return context
-
 
 class DistrictListView(ListView):
     model = Tower
@@ -49,6 +40,7 @@ class SingleDistrictListView(ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["title"] = f'Towers in the {self.kwargs["d"].capitalize()} District'
+        context['fancy'] = "Yes"
         return context
 
 

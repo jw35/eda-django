@@ -4,6 +4,38 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_head %}
+    {% if fancy %}
+    <link href="{% static 'tower_database/DataTables/datatables.min.css' %}" rel="stylesheet">
+    {% endif %}
+{% endblock %}
+
+{% block extra_js %}
+    {% if fancy %}
+    <script src="{% static 'tower_database/DataTables/datatables.min.js' %}"></script>
+    <script>
+    $(document).ready( function () {
+        $('#tower_table').DataTable({
+            paging: false,
+            layout: {
+                topStart: {
+                    buttons: ['searchPanes'],
+                }
+            },
+            columnDefs: [
+                {
+                    searchPanes: {
+                        show: false
+                    },
+                    targets: [1]
+                }
+            ]
+        });
+    } );
+    </script>
+    {% endif %}
+{% endblock %}
+
 {% block content %}
 
 <div class="row justify-content-center">
@@ -18,7 +50,7 @@
 <p>{{ notes }}</p>
 {% endif %}
 
-      <table class="table table-responsive table-sm">
+    <table id="tower_table" class="table table-responsive table-sm">
 
         <thead>
             <tr>
@@ -30,7 +62,7 @@
             </tr>
         </thead>
 
-    <tbody class="table-group-divider">
+        <tbody class="table-group-divider">
 
     	{% for tower in object_list %}
 
@@ -53,6 +85,8 @@
 
         {% endfor %}
 
-    </tbody>
+        </tbody>
+
+    </table>
 
 {% endblock %}
