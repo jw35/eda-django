@@ -154,7 +154,13 @@
 </table>
 
 {% for photo in tower.photo_set.all %}
-<p>{{ photo.img_tag }}</p>
+<p><a href="{{ photo.image.url }}">
+<br>{{ photo.img_tag }}</a>
+<br>({{ photo.height }}h x {{ photo.width }}w)
+{% if photo.credit %}
+Photo: <i>{{ photo.credit }}</i>
+{% endif %}
+</p>
 {% endfor %}
 
 {% if user_can_edit %}
