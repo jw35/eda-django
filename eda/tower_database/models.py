@@ -304,9 +304,9 @@ class ContactPerson(models.Model):
 class Contact(models.Model):
 
     class Roles(models.TextChoices):
-        CONTACT = 'C', 'General contact'
-        BELLS_CONTACT = 'BL'
-        BAND_CONTACT = 'BA'
+        CONTACT = 'C', 'General'
+        BELLS_CONTACT = 'BL', 'Bells'
+        BAND_CONTACT = 'BA', 'Band'
         TOWER_CAPTAIN = 'TC'
         RINGING_MASTER = 'RM'
         STEEPLEKEEPER = 'SK'
