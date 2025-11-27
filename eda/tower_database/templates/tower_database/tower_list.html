@@ -5,48 +5,16 @@
 {% block title %}{{ title }}{% endblock %}
 
 {% block extra_head %}
-    {% if fancy %}
     <link href="{% static 'tower_database/DataTables/datatables.min.css' %}" rel="stylesheet">
-    {% endif %}
 {% endblock %}
 
 {% block extra_js %}
-    {% if fancy %}
     <script src="{% static 'tower_database/DataTables/datatables.min.js' %}"></script>
-    <script>
-    $(document).ready( function () {
-        $('#tower_table').DataTable({
-            paging: false,
-            layout: {
-                topStart: {
-                    buttons: ['searchPanes'],
-                }
-            },
-            {% if group_by %}
-            orderFixed: [{{ group_by }}, '{{ direction|default:'asc' }}'],
-            rowGroup: {
-                dataSrc: {{ group_by }}
-            },
-            {% endif %}
-            columnDefs: [
-                {% if group_by %}
-                {
-                   target: {{ group_by }},
-                   visible: false,
-                    searchable: false
-                },
-                {% endif %}
-                {
-                    searchPanes: {
-                        show: false
-                    },
-                    targets: [1]
-                }
-            ]
-        });
-    } );
+    <script 
+        src="{% static 'tower_database/tower_list.js' %}"
+        data-group_by="{{ group_by }}"
+        data-table_id='tower_table'>
     </script>
-    {% endif %}
 {% endblock %}
 
 {% block content %}
