@@ -21,14 +21,14 @@
                 topStart: {
                     buttons: ['searchPanes'],
                 }
-            }, 
+            },
             {% if group_by %}
-             orderFixed: [{{ group_by }}, 'asc'],
-             rowGroup: {
-                 dataSrc: {{ group_by }}
-             }
-             {% endif %}
-             columnDefs: [
+            orderFixed: [{{ group_by }}, '{{ direction|default:'asc' }}'],
+            rowGroup: {
+                dataSrc: {{ group_by }}
+            },
+            {% endif %}
+            columnDefs: [
                 {% if group_by %}
                 {
                    target: {{ group_by }},
@@ -57,7 +57,7 @@
 
 <h1>{{ title }}</h1>
 
-<p>We believe our lists include all towers with 3 or more bells within the area of the Diocese of Ely<br>(not all of which owned and maintained by the Diocese itself).</p>
+<p>We believe our lists include all towers with 3 or more bells within the area of the Diocese of Ely<br>(not all of which owned and maintained by the Diocese itself). This list can be searched, filtered<br>and sorted.</p>
 
 {% if notes %}
 <p>{{ notes }}</p>
