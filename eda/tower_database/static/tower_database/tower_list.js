@@ -49,6 +49,13 @@ if (column) {
         target: column,
         visible: false,
         searchable: false
+    });
+    // Omit the grou_by column from searchPanes
+    dt_options['columnDefs'].push({
+        target: column,
+        searchPanes: {
+            show: false
+        },
     })
 };
 
