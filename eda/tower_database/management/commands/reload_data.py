@@ -7,9 +7,14 @@ from simple_history.utils import update_change_reason
 from tower_database.models import Tower, Contact, Website, Photo
 import requests
 import csv
+import random
 import re
 
 from io import StringIO
+
+from faker import Faker
+
+fake = Faker('en_uk')
 
 easy_fields = (
     ('Place', 'place'),
@@ -61,7 +66,7 @@ class Command(BaseCommand):
 
     def add_arguments(self, parser):
         parser.add_argument("--file", help="Import from CSV, rather than collecting directly")
-
+        parser.add_argument("--real", help="Use real contact data! not fake")
 
     def handle(self, *args, **options):
 
@@ -137,10 +142,11 @@ class Command(BaseCommand):
                 new_row = f.save()
                 update_change_reason(new_row, "Initial data load")
 
-                # Add contact(s)
+                # Add contact(s) if there's data
 
                 if csv_row['Secretary'] or csv_row['Phone'] or csv_row['Email']:
 
+                    # calculate role
                     publish = True
                     if csv_row['Band contact'] and csv_row['Bells contact']:
                         role = Contact.Roles.CONTACT
@@ -152,29 +158,55 @@ class Command(BaseCommand):
                         role = Contact.Roles.CONTACT
                         publish = False
 
-                    # Make a new Contact if we have details
-                    if csv_row['Secretary'] or csv_row['Phone'] or csv_row['email']:
+                    # Extract title/forename/name (gets office titles wrong...)
+                    match = re.match(r'((Mr|Mrs|Miss|Revd|Dr) +)?(.+) +(\w+)', csv_row['Secretary'])
+                    if match:
+                        title = match.group(2) if match.group(2) else ''
+                        forename = match.group(3) if match.group(3) else ''
+                        name = match.group(4) if match.group(4) else ''
+                    else:
+                        title = forename = ''
+                        name = csv_row['Secretary']
+                        
+                    phone1 = csv_row['phone'],
+                    phone2 = ''
+                    email = csv_row['Email'])
+                    link = ''
+                    
+                    reason = "Initial data load"
 
-                        match = re.match(r'((Mr|Mrs|Miss|Revd|Dr) +)?(.+) +(\w+)', csv_row['Secretary'])
-                        if match:
-                            title = match.group(2) if match.group(2) else ''
-                            forename = match.group(3) if match.group(3) else ''
-                            name = match.group(4) if match.group(4) else ''
-                        else:
-                            title = forename = ''
-                            name = csv_row['Secretary']
+                    # Overwrite everything with fake data unless --real 
+                    if not options['real']:
+                        male = randon.randint(0,1)
+                        if title:
+                            title =  fake.prefix_male() if male else fake.prefix_female()
+                        if forename:
+                            forename = fake.first_name_male() if male else fake.first_name_female()
+                        if name:
+                            name = fake.last_name_male() if male else fake.last_name_female()
+                        if phone1:
+                            phone1 = fake.phone_number()
+                        if not random.randint(0,19):
+                            phone2 = fake.phone_number()
+                        if email:
+                            email = fake.ascii_safe_email()
+                        if not randon.randint(0,19):
+                            link = fake.url()
+                        reason = "Initial random data load"
 
-                        new_row.contact_set.create(
-                            role=role, 
-                            publish=publish, 
-                            primary=True,
-                            title=title,
-                            forename=forename,
-                            name=name,
-                            phone1=csv_row['phone'],
-                            email=csv_row['Email'])
-                        update_change_reason(contact, "Initial data load")
-
+                    new_row.contact_set.create(
+                        role=role, 
+                        publish=publish, 
+                        primary=True,
+                        title=title,
+                        forename=forename,
+                        name=name,
+                        phone1=phone1,
+                        phone2=phone2,
+                        email=email,
+                        link=link)
+                        
+                    update_change_reason(contact, reason)
 
                 # Add website, unless it points to Dove
                 if csv_row['Website'] and "dove.cccbr.org.uk" not in csv_row['Website']:
