@@ -4,7 +4,7 @@ from django.forms import ModelForm
 
 from simple_history.utils import update_change_reason
 
-from tower_database.models import Tower, Contact, ContactPerson, Website, Photo
+from tower_database.models import Tower, Contact, Website, Photo
 import requests
 import csv
 import re
@@ -68,7 +68,6 @@ class Command(BaseCommand):
         # Clear out all the old stuff
         Tower.objects.all().delete()
         Contact.objects.all().delete()
-        ContactPerson.objects.all().delete()
         Website.objects.all().delete()
         Photo.objects.all().delete()
 
@@ -76,7 +75,6 @@ class Command(BaseCommand):
         with connection.cursor() as cursor:
             cursor.execute("delete from sqlite_sequence where name='tower_database_tower';")
             cursor.execute("delete from sqlite_sequence where name='tower_database_contact';")
-            cursor.execute("delete from sqlite_sequence where name='tower_database_contact_person';")
             cursor.execute("delete from sqlite_sequence where name='tower_database_website';")
             cursor.execute("delete from sqlite_sequence where name='tower_database_photo';")
 
@@ -154,8 +152,8 @@ class Command(BaseCommand):
                         role = Contact.Roles.CONTACT
                         publish = False
 
-                    # Make a new ContactPerson and ann them to Contact if we have a name or phone number
-                    if csv_row['Secretary'] or csv_row['Phone']:
+                    # Make a new Contact if we have details
+                    if csv_row['Secretary'] or csv_row['Phone'] or csv_row['email']:
 
                         match = re.match(r'((Mr|Mrs|Miss|Revd|Dr) +)?(.+) +(\w+)', csv_row['Secretary'])
                         if match:
@@ -166,17 +164,15 @@ class Command(BaseCommand):
                             title = forename = ''
                             name = csv_row['Secretary']
 
-                        (contact_person, created) = ContactPerson.objects.get_or_create(title=title, forename=forename, name=name, personal_phone=csv_row['Phone'], personal_email=csv_row['Email'])
-                        if created:
-                            update_change_reason(contact_person, "Initial data load")
-
-                        contact = new_row.contact_set.create(role=role, publish=publish, primary=True, person=contact_person)
-                        update_change_reason(contact, "Initial data load")
-
-                    # Otherwise, just add a new Contact
-                    else:
-
-                        new_row.contact_set.create(role=role, publish=publish, primary=True, email=csv_row['Email'])
+                        new_row.contact_set.create(
+                            role=role, 
+                            publish=publish, 
+                            primary=True,
+                            title=title,
+                            forename=forename,
+                            name=name,
+                            phone1=csv_row['phone'],
+                            email=csv_row['Email'])
                         update_change_reason(contact, "Initial data load")
 
 

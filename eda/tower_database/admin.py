@@ -10,7 +10,7 @@ from simple_history.admin import SimpleHistoryAdmin
 
 # Register your models here.
 
-from .models import ContactPerson, Contact, Tower, Photo, Website, Dove
+from .models import Contact, Tower, Photo, Website, Dove
 
 from position_widget.widgets import PositionInput
 
@@ -19,17 +19,6 @@ admin.site.site_title = "Database admin"
 admin.site.index_title = "Database admin"
 
 ### INLINES
-
-class ContactPersonInline(admin.TabularInline):
-    model = ContactPerson
-    extra = 0
-
-
-class ContactInlineForPerson(admin.TabularInline):
-    model = Contact
-    fields = ["role", "tower", "publish", "primary"]
-    readonly_fields = ["role", "tower", "publish", "primary"]
-    extra = 0
 
 
 class ContactInline(admin.TabularInline):
@@ -217,7 +206,7 @@ class ContactPersonAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 
 
 class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    list_display = ["tower", "role", "person", "email", "form"]
+    list_display = ["tower", "role", "title", "forename", "name", "phone1", "phone2", "email", "form"]
     readonly_fields = ["tower"]
 
     def has_change_permission(self, request, obj=None):
@@ -306,7 +295,6 @@ class DoveAdmin(SearchAutoCompleteAdmin):
     def has_add_permission(self, request):
         return False
 
-admin.site.register(ContactPerson, ContactPersonAdmin)
 admin.site.register(Contact, ContactAdmin)
 admin.site.register(Tower, TowerAdmin)
 admin.site.register(Dove, DoveAdmin)

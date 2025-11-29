@@ -32,17 +32,16 @@ class Command(BaseCommand):
             )
 
         # Sets of permissions to allocate
-        ro_permissions = ('view_contact' , 'view_contactperson', 'view_dove', 'view_photo', 'view_tower','view_website')
+        ro_permissions = ('view_contact' , 'view_dove', 'view_photo', 'view_tower','view_website')
 
         admin_permissions = ('add_contact', 'change_contact', 'view_contact',
-                 'add_contactperson', 'change_contactperson', 'delete_contactperson', 'view_contactperson',
                  'view_dove',
                  'add_photo', 'change_photo', 'delete_photo', 'view_photo',
                  'add_tower', 'change_tower', 'delete_tower', 'view_tower',
                  'add_website', 'change_website', 'delete_website', 'view_website'
                  )
 
-        district_admin_permissions = ('add_contactperson', 'change_contactperson', 'view_contactperson')
+        district_admin_permissions = ()
 
         # Get all existing permissions
         all_permissions = Permission.objects.filter(content_type__app_label='tower_database')
@@ -70,50 +69,3 @@ class Command(BaseCommand):
                     or perm.codename in ro_permissions
                     or perm.codename in district_admin_permissions):
                      group.permissions.add(perm)
-
-
-'''
-
-
-**contact add_contact
-**contact change_contact
-**contact delete_contact
-contact view_contact
-**contactmap add_contactmap
-**contactmap change_contactmap
-**contactmap delete_contactmap
-contactmap view_contactmap
-**dove add_dove
-**dove change_dove
-**dove delete_dove
-dove view_dove
-historicalcontact add_historicalcontact
-historicalcontact change_historicalcontact
-historicalcontact delete_historicalcontact
-historicalcontact view_historicalcontact
-historicalcontactmap add_historicalcontactmap
-historicalcontactmap change_historicalcontactmap
-historicalcontactmap delete_historicalcontactmap
-historicalcontactmap view_historicalcontactmap
-historicaltower add_historicaltower
-historicaltower change_historicaltower
-historicaltower delete_historicaltower
-historicaltower view_historicaltower
-historicalwebsite add_historicalwebsite
-historicalwebsite change_historicalwebsite
-historicalwebsite delete_historicalwebsite
-historicalwebsite view_historicalwebsite
-**photo add_photo
-**photo change_photo
-**photo delete_photo
-photo view_photo
-**tower add_tower
-**tower change_tower
-**tower delete_tower
-tower view_tower
-**website add_website
-**website change_website
-**website delete_website
-website view_website
-
-'''

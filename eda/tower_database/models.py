@@ -257,50 +257,6 @@ class Tower(models.Model):
             raise ValidationError(errors)
 
 
-class ContactPerson(models.Model):
-
-    class Titles(models.TextChoices):
-        MR = 'Mr', 'Mr.'
-        MRS = 'Mrs', 'Mrs.'
-        MISS = 'Miss', 'Miss.'
-        DR = 'Dr', 'Dr.'
-        REVD = 'Revd', "The Rev'd"
-
-    title = models.CharField(max_length=5, blank=True, choices=Titles, help_text="Person's title (if required - usually leave blank)")
-    forename = models.CharField(max_length=100, blank=True, help_text="Person's forename")
-    name = models.CharField(max_length=100, blank=True, help_text="Person's surname, or office title")
-    personal_phone = models.CharField(max_length=100, blank=True, help_text="Personal/office contact phone number")
-    personal_phone2 = models.CharField(max_length=100, blank=True, verbose_name="Other personal phone", help_text="Alternate personal/office phone number")
-    personal_email = models.EmailField(max_length=100, blank=True, help_text="Personal/office email address")
-    history = HistoricalRecords()
-
-    class Meta:
-        ordering = ["name", "forename", "title"]
-        unique_together = ["title", "forename", "name", "personal_phone", "personal_phone2", "personal_email"]
-        verbose_name_plural = "Contact People"
-        constraints = [
-            models.CheckConstraint(
-                condition=~Q(name='') | ~Q(personal_phone='') | ~Q(personal_phone2='') | ~Q(personal_email=''),
-                name="no_non_blank_contact_persons",
-                violation_error_message="Contact Person details can't be entirely blank"
-            ),
-        ]
-
-    def __str__(self):
-        if self.full_name:
-            return self.full_name
-        elif self.personal_email:
-            return self.personal_email
-        elif self.personal_phone or self.personal_phone2:
-            return ' / '.join([f for f in (self.personal_phone, self.personal_phone2) if f != ''])
-        else:
-            return '--blank contact person--'
-
-    @property
-    def full_name(self):
-        return ' '.join([f for f in (self.title, self.forename, self.name) if f != ''])
-
-
 class Contact(models.Model):
 
     class Roles(models.TextChoices):
@@ -310,41 +266,60 @@ class Contact(models.Model):
         TOWER_CAPTAIN = 'TC'
         RINGING_MASTER = 'RM'
         STEEPLEKEEPER = 'SK'
+        
+    class Titles(models.TextChoices):
+        MR = 'Mr', 'Mr.'
+        MRS = 'Mrs', 'Mrs.'
+        MISS = 'Miss', 'Miss.'
+        DR = 'Dr', 'Dr.'
+        REVD = 'Revd', "The Rev'd"
 
     role = models.CharField(max_length=30, choices=Roles)
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
     publish = models.BooleanField(default=True)
     primary = models.BooleanField(default=False, help_text="Primary com=ntact for this Tower?")
-    person = models.ForeignKey(ContactPerson, blank=True, null=True, on_delete=models.PROTECT)
+    title = models.CharField(max_length=5, blank=True, choices=Titles, help_text="Person's title (if required - usually leave blank)")
+    forename = models.CharField(max_length=100, blank=True, help_text="Person's forename")
+    name = models.CharField(max_length=100, blank=True, help_text="Person's surname, or office title")
+    phone1 = models.CharField(max_length=100, blank=True, verbose_name="phone" help_text="Personal/office contact phone number")
+    phone2 = models.CharField(max_length=100, blank=True, verbose_name="phone" help_text="Alternate personal/office phone number")
     email = models.EmailField(max_length=100, blank=True, help_text="Contact email address")
     form = models.URLField(blank=True, help_text="Link to a contact form")
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ["tower", "person__name", "person__forename", "person__title"]
+        ordering = ["tower", "name", "forename", "title"]
         constraints = [
-            models.UniqueConstraint(fields=["tower"], condition=Q(primary=True), name="unique_tower_primary",
-                violation_error_message="Towers can only have a single primary contact")
+            models.UniqueConstraint(fields=["tower"], condition=Q(primary=True),
+                name="unique_tower_primary",
+                violation_error_message="Towers can only have a single primary contact"),
+            models.CheckConstraint(
+                condition=~Q(name='') | ~Q(phone1='') | ~Q(phone2='') | ~Q(email='') | ~Q(link=''),
+                name="no_non_blank_contact_persons",
+                violation_error_message="Contact details can't be entirely blank"
+            ),
         ]
 
     def __str__(self):
         return f'{self.tower} {self.get_role_display()}'
+        
+    @property
+    def full_name(self):
+        return ' '.join([f for f in (self.title, self.forename, self.name) if f != ''])
 
     @property
     def as_links(self):
         fragments = []
-        if self.person.full_name:
-            fragments.append(self.person.full_name)
-        if self.person.personal_phone:
-            fragments.append(self.person.personal_phone)
-        if self.person.personal_phone2:
-            fragments.append(self.person.personal_phone2)
+        if self.full_name:
+            fragments.append(escape(self.full_name))
+        if self.phone1:
+            fragments.append(escape(self.phone1))
+        if self.phone2:
+            fragments.append(escape(self.phone2))
         if self.email:
-            fragments.append(f'<a href="mailto:{self.email}">{self.email}</a>')
-        elif self.person.personal_email:
-            fragments.append(f'<a href="mailto:{self.person.personal_email}">{self.person.personal_email}</a>')
+            fragments.append(f'<a href="mailto:{escape(self.email)}">{escape(self.email)}</a>')
         if self.form:
-            fragments.append(f'<a href="{self.form}">Contact form</a>')
+            fragments.append(f'<a href="{escape(self.form)}">Contact form</a>')
         return mark_safe(' / '.join(fragments))
 
 
