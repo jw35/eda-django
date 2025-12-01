@@ -167,17 +167,17 @@ class Command(BaseCommand):
                     else:
                         title = forename = ''
                         name = csv_row['Secretary']
-                        
-                    phone1 = csv_row['phone'],
+
+                    phone1 = csv_row['Phone']
                     phone2 = ''
-                    email = csv_row['Email'])
-                    link = ''
-                    
+                    email = csv_row['Email']
+                    form = ''
+
                     reason = "Initial data load"
 
-                    # Overwrite everything with fake data unless --real 
+                    # Overwrite everything with fake data unless --real
                     if not options['real']:
-                        male = randon.randint(0,1)
+                        male = random.randint(0,1)
                         if title:
                             title =  fake.prefix_male() if male else fake.prefix_female()
                         if forename:
@@ -190,13 +190,13 @@ class Command(BaseCommand):
                             phone2 = fake.phone_number()
                         if email:
                             email = fake.ascii_safe_email()
-                        if not randon.randint(0,19):
-                            link = fake.url()
+                        if not random.randint(0,19):
+                            form = fake.uri()
                         reason = "Initial random data load"
 
-                    new_row.contact_set.create(
-                        role=role, 
-                        publish=publish, 
+                    contact = new_row.contact_set.create(
+                        role=role,
+                        publish=publish,
                         primary=True,
                         title=title,
                         forename=forename,
@@ -204,8 +204,8 @@ class Command(BaseCommand):
                         phone1=phone1,
                         phone2=phone2,
                         email=email,
-                        link=link)
-                        
+                        form=form)
+
                     update_change_reason(contact, reason)
 
                 # Add website, unless it points to Dove

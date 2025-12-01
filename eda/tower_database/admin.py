@@ -198,16 +198,13 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     ]
 
 
-class ContactPersonAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    search_fields = ["forename", "name", "personal_phone", "personal_phone2", "personal_email"]
-    search_help_text = "Search by name, phone number or email"
-    list_display = ["name", "title", "forename", "personal_phone", "personal_phone2", "personal_email"]
-    inlines = [ContactInlineForPerson]
-
 
 class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    list_display = ["tower", "role", "title", "forename", "name", "phone1", "phone2", "email", "form"]
-    readonly_fields = ["tower"]
+    fields = ["tower", "role", "primary", "publish", "title", "forename", "name", "phone1", "phone2", "email", "form"]
+    list_display = ["full_name", "tower", "role", "phone1", "phone2", "email"]
+    readonly_fields = ["full_name"]
+    search_fields = ["forename", "name", "phone1", "phone2", "email"]
+    search_help_text = "Search by name, phone orr email"
 
     def has_change_permission(self, request, obj=None):
         if obj == None:
@@ -233,9 +230,9 @@ class ContactAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 
 
 class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
-    search_fields = ["url", "target"]
+    search_fields = ["url", "link_text"]
     search_help_text = "Search by website address or link text"
-    fields = ["tower", "link_text", "url"]
+    fields = ["tower", "url", "link_text"]
     list_display = ["tower", "link_text", "url"]
 
     def has_change_permission(self, request, obj=None):

@@ -1,3 +1,4 @@
+from django.contrib import admin
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -266,7 +267,7 @@ class Contact(models.Model):
         TOWER_CAPTAIN = 'TC'
         RINGING_MASTER = 'RM'
         STEEPLEKEEPER = 'SK'
-        
+
     class Titles(models.TextChoices):
         MR = 'Mr', 'Mr.'
         MRS = 'Mrs', 'Mrs.'
@@ -276,34 +277,35 @@ class Contact(models.Model):
 
     role = models.CharField(max_length=30, choices=Roles)
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
-    publish = models.BooleanField(default=True)
-    primary = models.BooleanField(default=False, help_text="Primary com=ntact for this Tower?")
+    publish = models.BooleanField(default=True, help_text="Publish these details (in the Annual Report, on the web, etc.)")
+    primary = models.BooleanField(default=False, help_text="Primary contact for this Tower?")
     title = models.CharField(max_length=5, blank=True, choices=Titles, help_text="Person's title (if required - usually leave blank)")
     forename = models.CharField(max_length=100, blank=True, help_text="Person's forename")
-    name = models.CharField(max_length=100, blank=True, help_text="Person's surname, or office title")
-    phone1 = models.CharField(max_length=100, blank=True, verbose_name="phone" help_text="Personal/office contact phone number")
-    phone2 = models.CharField(max_length=100, blank=True, verbose_name="phone" help_text="Alternate personal/office phone number")
-    email = models.EmailField(max_length=100, blank=True, help_text="Contact email address")
+    name = models.CharField(max_length=100, blank=True, help_text="Person's surname, or role title")
+    phone1 = models.CharField(max_length=100, blank=True, verbose_name="phone", help_text="Phone number")
+    phone2 = models.CharField(max_length=100, blank=True, verbose_name="phone", help_text="Alternate phone number")
+    email = models.EmailField(max_length=100, blank=True, help_text="Personal or role email address")
     form = models.URLField(blank=True, help_text="Link to a contact form")
     history = HistoricalRecords()
 
     class Meta:
-        ordering = ["tower", "name", "forename", "title"]
+        ordering = ["name", "forename", "tower", "email", "phone1", "phone2"]
         constraints = [
             models.UniqueConstraint(fields=["tower"], condition=Q(primary=True),
                 name="unique_tower_primary",
                 violation_error_message="Towers can only have a single primary contact"),
             models.CheckConstraint(
-                condition=~Q(name='') | ~Q(phone1='') | ~Q(phone2='') | ~Q(email='') | ~Q(link=''),
+                condition=~Q(name='') | ~Q(phone1='') | ~Q(phone2='') | ~Q(email='') | ~Q(form=''),
                 name="no_non_blank_contact_persons",
-                violation_error_message="Contact details can't be entirely blank"
+                violation_error_message="Need at least one of name, phone, email or form"
             ),
         ]
 
     def __str__(self):
-        return f'{self.tower} {self.get_role_display()}'
-        
+        return f'{self.tower} ({self.get_role_display()})'
+
     @property
+    @admin.display(ordering="first_name")
     def full_name(self):
         return ' '.join([f for f in (self.title, self.forename, self.name) if f != ''])
 
@@ -338,7 +340,7 @@ class Website(models.Model):
         ]
 
     def __str__(self):
-        return f'{self.tower} {self.url}'
+        return f'{self.tower}'
 
 
 def rename_image(instance, filename):
