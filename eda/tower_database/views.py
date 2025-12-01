@@ -1,8 +1,12 @@
-from django.http import Http404
+from django.db import models
+from django.db.models.fields import Field
+from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 
-from .models import Tower
+from geojson import Point, Feature, FeatureCollection, dumps
+
+from .models import Tower, Contact, Website, Photo
 
 # Create your views here.
 
@@ -91,3 +95,70 @@ class TowerDetailView(DetailView):
         )
 
         return context
+
+
+def tower_as_geojson(tower):
+
+    point = Point((float(tower.lng), float(tower.lat)))
+
+    properties = {}
+
+    for  field in Tower._meta.get_fields():
+        if  isinstance(field, Field) and field.name not in ('id', 'lat', 'lng', 'maintainer_notes'):
+            properties[field.name] = getattr(tower, field.name)
+
+    contacts = []
+    for contact in tower.contact_set.all():
+        c = {}
+        for  field in Contact._meta.get_fields():
+            if  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
+                c[field.name] = getattr(contact, field.name)
+        contacts.append(c)
+    properties['contacts'] = contacts
+
+    websites = []
+    for website in tower.website_set.all():
+        w = {}
+        for  field in Website._meta.get_fields():
+            if  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
+                w[field.name] = getattr(website, field.name)
+        websites.append(w)
+    properties['websites'] = websites
+
+    photos = []
+    for photo in tower.photo_set.all():
+        p = {}
+        for  field in Photo._meta.get_fields():
+            if isinstance(field, models.ImageField):
+                p[field.name] = getattr(photo, field.name).url
+            elif  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
+                p[field.name] = getattr(photo, field.name)
+        photos.append(p)
+    properties['phptos'] = photos
+
+    return Feature(id=tower.id, geometry=point, properties=properties)
+
+
+def geojson(request, pk=None):
+
+    if pk:
+        tower = get_object_or_404(Tower, pk=pk)
+        result = tower_as_geojson(tower)
+        filename = f'tower-{pk}.geojson'
+
+    else:
+        features = []
+        for tower in Tower.objects.all():
+            features.append(tower_as_geojson(tower))
+        result = FeatureCollection(features)
+        filename = 'towers.geojson'
+
+    response = HttpResponse(
+        content_type='application/geo+json',
+        headers={'Content-Disposition': f'attachment; filename="{filename}"'},
+    )
+
+    response.writelines(dumps(result, indent=2))
+
+    return response
+

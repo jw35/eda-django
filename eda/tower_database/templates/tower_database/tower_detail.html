@@ -157,6 +157,8 @@ Photo: <i>{{ photo.credit }}</i>
 </p>
 {% endfor %}
 
+<p><a href="{% url 'tower_geojson' tower.pk %}">This tower as GeoJSON</a></p>
+
 {% if user_can_edit %}
 <p>[Admin only: <a href="{% url 'admin:tower_database_tower_change' tower.pk %}">Edit</a>]</p>
 {% endif %}
