@@ -148,7 +148,7 @@ def geojson(request, pk=None):
 
     else:
         features = []
-        for tower in Tower.objects.all():
+        for tower in Tower.objects.prefetch_related('contact_set', 'website_set', 'photo_set'):
             features.append(tower_as_geojson(tower))
         result = FeatureCollection(features)
         filename = 'towers.geojson'
