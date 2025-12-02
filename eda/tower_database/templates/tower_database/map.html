@@ -1,0 +1,30 @@
+{% extends 'eda/base.html' %}
+
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{% block extra_head %}
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.3/dist/leaflet.css" integrity="sha256-kLaT2GOSpHechhsozzB+flnD+zUyjE2LlfWPgU04xyI=" crossorigin="" />
+<link rel="stylesheet" href="{% static 'tower_database/map/map.css' %}" type="text/css">
+{% endblock %}
+
+{% block extra_js %}
+    <script src="https://unpkg.com/leaflet@1.9.3/dist/leaflet.js" integrity="sha256-WBkoXOwTeyKclOHuWtc+i2uENFpDZ9YPdf5Hf+D7ewM=" crossorigin=""></script>
+    <script
+    src="https://code.jquery.com/jquery-3.6.3.min.js"
+    integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
+    crossorigin="anonymous"></script>
+    <script
+        src="{% static 'tower_database/map/map.js' %}"
+        data-static_root="{% static 'tower_database/map' %}"
+        data-towers_json="{% url 'towers_geojson' %}"
+        data-div_id="map">
+    </script>
+{% endblock %}
+
+{% block content %}
+    <div class="header"></div>
+    <div id="map"></div>
+{% endblock %}

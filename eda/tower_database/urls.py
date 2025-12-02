@@ -3,6 +3,7 @@
 
 
 from django.urls import path, re_path
+from django.views.generic import TemplateView
 
 from . import views
 
@@ -18,5 +19,6 @@ urlpatterns = [
     path(r'tower/<int:pk>/', view=views.TowerDetailView.as_view(), name='tower_detail'),
     path(r'geojson/', view=views.geojson, name='towers_geojson'),
     path(r'geojson/<int:pk>/', view=views.geojson, name='tower_geojson'),
+    path(r'map/', view=TemplateView.as_view(template_name="tower_database/map.html"), name='map'),
 
 ]
