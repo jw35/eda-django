@@ -115,6 +115,10 @@
         {% endif %}
 	</tr>
 	<tr>
+		<td class="fw-bold">EDA Tower ID</td>
+		<td><a href="{% url 'tower_detail' tower.pk %}">{{ tower.pk }}</a></td>
+	</tr>
+	<tr>
 		<td class="fw-bold">EDA District</td>
 		<td>{{ tower.get_district_display }}</td>
 	</tr>
@@ -157,7 +161,7 @@ Photo: <i>{{ photo.credit }}</i>
 </p>
 {% endfor %}
 
-<p><a href="{% url 'tower_geojson' tower.pk %}">This tower as GeoJSON</a></p>
+<p>This tower as <a href="{% url 'tower_geojson' tower.pk %}">machine-readable GeoJSON</a></p>
 
 {% if user_can_edit %}
 <p>[Admin only: <a href="{% url 'admin:tower_database_tower_change' tower.pk %}">Edit</a>]</p>
