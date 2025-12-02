@@ -106,6 +106,8 @@ def tower_as_geojson(tower):
     for  field in Tower._meta.get_fields():
         if  isinstance(field, Field) and field.name not in ('id', 'latlng', 'maintainer_notes'):
             properties[field.name] = getattr(tower, field.name)
+        # OS Grid isn't actually a field...
+        properties['os_grid'] = tower.os_grid
 
     contacts = []
     for contact in tower.contact_set.all():
