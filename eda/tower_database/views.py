@@ -2,11 +2,15 @@ from django.db import models
 from django.db.models.fields import Field
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.views.decorators.cache import cache_page
 from django.views.generic import ListView, DetailView
 
 from geojson import Point, Feature, FeatureCollection, dump
 
 from .models import Tower, Contact, Website, Photo
+
+import logging
+logger = logging.getLogger(__name__)
 
 # Create your views here.
 
@@ -154,7 +158,10 @@ def tower_as_geojson(tower):
     return Feature(id=tower.id, geometry=point, properties=properties)
 
 
+@cache_page(None)
 def geojson(request, pk=None):
+
+    logger.info('Rebuilding the GeoJSONson page')
 
     if pk:
         tower = get_object_or_404(Tower, pk=pk)

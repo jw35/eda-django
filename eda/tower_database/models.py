@@ -1,4 +1,5 @@
 from django.contrib import admin
+from django.core.cache import cache
 from django.core.exceptions import ValidationError
 from django.db import models
 from django.db.models import Q
@@ -17,6 +18,21 @@ import uuid
 from collections import defaultdict
 
 
+# Shortcut for invalidating the cache (used for GEioJANGO) when 
+# a model instance is saved or deleted
+
+class CacheInvalidayingModel(models.Model):
+
+    class Meta:
+        abstract = True
+
+    def save(self, **kwargs):
+        super().save(**kwargs)
+        cache.clear()
+
+    def delete(self, **kwargs):
+        super().save(**kwargs)
+        cache.clear()
 
 # Create your models here.
 
@@ -46,7 +62,7 @@ class TowerConstants():
     WEEK_PHRASE_PATTERN = re.compile(r'\bNot\b(?! Bank Holiday)|1st|2nd|3rd|4th|5th|\bAlternate\b', re.IGNORECASE)
 
 
-class Tower(models.Model):
+class Tower(CacheInvalidayingModel):
 
     class Counties(models.TextChoices):
         CAMBRIDGESHIRE = "C"
@@ -258,7 +274,7 @@ class Tower(models.Model):
             raise ValidationError(errors)
 
 
-class Contact(models.Model):
+class Contact(CacheInvalidayingModel):
 
     class Roles(models.TextChoices):
         CONTACT = 'C', 'General'
@@ -325,7 +341,7 @@ class Contact(models.Model):
         return mark_safe(' / '.join(fragments))
 
 
-class Website(models.Model):
+class Website(CacheInvalidayingModel):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
     link_text = models.CharField(max_length=50, blank=True, help_text="Short link text for this website")
@@ -349,7 +365,7 @@ def rename_image(instance, filename):
     tower = re.sub(r'[^a-z_]+', '', tower)
     return f"towers/{tower}_{uuid.uuid4()}{suffix}"
 
-class Photo(models.Model):
+class Photo(CacheInvalidayingModel):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
     image = models.ImageField(upload_to=rename_image, height_field="height", width_field="width")

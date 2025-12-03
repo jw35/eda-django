@@ -252,7 +252,8 @@ const overlays = {
                 }
             }
         ),
-        add_to: association_fg
+        add_to: association_fg,
+        fit_bounds: true
     },
     districts:
     {
@@ -530,6 +531,9 @@ function load_boundary_data() {
                 if (overlay.add_to) {
                     overlay.layer.addTo(overlay.add_to);
                 }
+                if (overlay.fit_bounds) {
+                    map.fitBounds(overlay.layer.getBounds(), {paddingTopLeft: [15, 10], paddingBottomRight: [15, 12]});
+                }
             }
         ).fail(
             function (ignore, ignore1, error_thrown) {
@@ -587,7 +591,6 @@ function load_tower_data(map) {
                 }
             );
             filter_towers();
-            map.fitBounds(tower_layer.getBounds(), {paddingTopLeft: [15, 10], paddingBottomRight: [15, 12]});
             setup_tower_listeners();
         }
     ).fail(
