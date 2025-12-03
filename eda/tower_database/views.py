@@ -4,7 +4,7 @@ from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
 from django.views.generic import ListView, DetailView
 
-from geojson import Point, Feature, FeatureCollection, dumps
+from geojson import Point, Feature, FeatureCollection, dump
 
 from .models import Tower, Contact, Website, Photo
 
@@ -173,7 +173,7 @@ def geojson(request, pk=None):
         #headers={'Content-Disposition': f'attachment; filename="{filename}"'},
     )
 
-    response.writelines(dumps(result, indent=2))
+    dump(result, response)
 
     return response
 
