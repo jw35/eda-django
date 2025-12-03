@@ -116,7 +116,7 @@
 	</tr>
 	<tr>
 		<td class="fw-bold">EDA Tower ID</td>
-		<td><a href="{% url 'tower_detail' tower.pk %}">{{ tower.pk }}</a></td>
+		<td>{{ tower.pk }}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">EDA District</td>
@@ -154,9 +154,9 @@
 {% for photo in tower.photo_set.all %}
 <p><a href="{{ photo.image.url }}">
 <br>{{ photo.img_tag }}</a>
-<br>({{ photo.height }}h x {{ photo.width }}w)
+<br>({{ photo.height }}h x {{ photo.width }}w, alt="{{photo.alt_text}}")
 {% if photo.credit %}
-Photo: <i>{{ photo.credit }}</i>
+<br>Photo: <i>{{ photo.credit }}</i>
 {% endif %}
 </p>
 {% endfor %}

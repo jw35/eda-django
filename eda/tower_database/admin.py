@@ -69,7 +69,7 @@ class WebsiteInline(admin.TabularInline):
 
 class PhotoInline(admin.StackedInline):
     model = Photo
-    fields = ["tower", "image", "img_tag", "credit", "height", "width"]
+    fields = ["tower", "image", "img_tag", "alt_text", "credit", "height", "width"]
     readonly_fields = ["height", "width", "img_tag"]
     extra = 0
 
@@ -259,7 +259,7 @@ class WebsiteAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
 
 
 class PhotoAdmin(SimpleHistoryAdmin):
-    fields = ["tower", "image", "img_tag", "credit", "height", "width"]
+    fields = ["tower", "image", "img_tag", "alt_text", "credit", "height", "width"]
     readonly_fields = ["height", "width", "img_tag"]
     list_display = ["tower", "height", "width", "img_tag"]
 

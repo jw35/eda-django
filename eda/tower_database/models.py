@@ -353,9 +353,10 @@ class Photo(models.Model):
 
     tower = models.ForeignKey(Tower, on_delete=models.CASCADE)
     image = models.ImageField(upload_to=rename_image, height_field="height", width_field="width")
+    alt_text = models.CharField(max_length=50, blank=True, help_text="Short text description of the photo")
     height = models.SmallIntegerField(blank=True, null=True, editable=False)
     width = models.SmallIntegerField(blank=True, null=True, editable=False)
-    credit = models.CharField(max_length=100, blank=True)
+    credit = models.CharField(max_length=100, blank=True, help_text = "Source of the photo")
     history = HistoricalRecords()
 
     class Meta:
@@ -366,7 +367,7 @@ class Photo(models.Model):
 
     @property
     def img_tag(self):
-        return mark_safe(f'<img src="{escape(self.image.url)}" height="{min(self.image.height, 200)}">')
+        return mark_safe(f'<img src="{escape(self.image.url)}" height="{min(self.image.height, 200)} alt="{self.alt_text}">')
 
 
 # Auto-generated with ./manage.py inspectdb
