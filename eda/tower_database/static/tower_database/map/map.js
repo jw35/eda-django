@@ -532,7 +532,7 @@ function load_boundary_data() {
                     overlay.layer.addTo(overlay.add_to);
                 }
                 if (overlay.fit_bounds) {
-                    map.fitBounds(overlay.layer.getBounds(), {paddingTopLeft: [15, 10], paddingBottomRight: [15, 12]});
+                    map.fitBounds(overlay.layer.getBounds(), {paddingTopLeft: [-20, -20], paddingBottomRight: [-20, -20]});
                 }
             }
         ).fail(
@@ -621,7 +621,7 @@ function setup_panes(map) {
 
 $(document).ready(function () {
 
-    map = L.map(div_id, {minZoom: 8});
+    map = L.map(div_id, {minZoom: 8, zoomSnap: 0.25, zoomDelta: 0.5});
 
     setup_panes(map);
 
