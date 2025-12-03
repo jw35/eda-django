@@ -103,21 +103,33 @@ def tower_as_geojson(tower):
 
     properties = {}
 
+    # All (most) individual Tower fields
     for  field in Tower._meta.get_fields():
         if  isinstance(field, Field) and field.name not in ('id', 'latlng', 'maintainer_notes'):
             properties[field.name] = getattr(tower, field.name)
         # OS Grid isn't actually a field...
         properties['os_grid'] = tower.os_grid
 
-    contacts = []
-    for contact in tower.contact_set.all():
-        c = {}
+    # Tower primary contact, if available and publishable
+    primary_c = {}
+    if tower.primary_contact and tower.primary_contact.publish:
         for  field in Contact._meta.get_fields():
             if  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
-                c[field.name] = getattr(contact, field.name)
-        contacts.append(c)
-    properties['contacts'] = contacts
+                primary_c[field.name] = getattr(tower.primary_contact, field.name)
+    properties['primary_contact'] = primary_c
 
+    # All other Tower contacts, if publishable
+    other_contacts = []
+    for contact in tower.other_contacts:
+        if contact.publish:
+            c = {}
+            for  field in Contact._meta.get_fields():
+                if  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
+                    c[field.name] = getattr(contact, field.name)
+            other_contacts.append(c)
+    properties['other_contacts'] = other_contacts
+
+    # All websites
     websites = []
     for website in tower.website_set.all():
         w = {}
@@ -127,6 +139,7 @@ def tower_as_geojson(tower):
         websites.append(w)
     properties['websites'] = websites
 
+    # All photos
     photos = []
     for photo in tower.photo_set.all():
         p = {}
@@ -136,7 +149,7 @@ def tower_as_geojson(tower):
             elif  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
                 p[field.name] = getattr(photo, field.name)
         photos.append(p)
-    properties['phptos'] = photos
+    properties['photos'] = photos
 
     return Feature(id=tower.id, geometry=point, properties=properties)
 
@@ -157,7 +170,7 @@ def geojson(request, pk=None):
 
     response = HttpResponse(
         content_type='application/geo+json',
-        headers={'Content-Disposition': f'attachment; filename="{filename}"'},
+        #headers={'Content-Disposition': f'attachment; filename="{filename}"'},
     )
 
     response.writelines(dumps(result, indent=2))

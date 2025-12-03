@@ -81,7 +81,6 @@ L.Control.EdaMap = L.Control.extend({
             L.DomUtil.addClass(box, 'filter_control');
             box.type = 'checkbox';
             box.id = checkbox[i]['id'];
-            console.log(location.search)
             if (checkbox[i]['district'] && location.search && location.search !== `?${checkbox[i]['id']}`) {
                 box.defaultChecked = false;
             }
@@ -310,37 +309,37 @@ function toggle_display(layer) {
     var tower = layer.feature.properties;
     var show = 1;
 
-    if (this.limit_type === '=' && tower.bells !== this.limit_number) {
+    if (this.limit_type === '=' && tower.bells !== parseInt(this.limit_number)) {
         show = 0;
     }
-    else if (this.limit_type === '>' && parseInt(tower.bells) < parseInt(this.limit_number)) {
+    else if (this.limit_type === '>' && tower.bells < parseInt(this.limit_number)) {
         show =0;
     }
 
-    if (!this.unringable && tower.Status === 'N') {
+    if (!this.unringable && tower.ringing_status === 'N') {
         show = 0;
     }
 
-    if (!this.cambridge && tower.District.charAt(0) === 'C') {
+    if (!this.cambridge && tower.district === 'C') {
         show = 0;
     }
-    if (!this.ely && tower.District.charAt(0) === 'E') {
+    if (!this.ely && tower.district === 'E') {
         show = 0;
     }
-    if (!this.huntingdon && tower.District.charAt(0) === 'H') {
+    if (!this.huntingdon && tower.district === 'H') {
         show = 0;
     }
-    if (!this.wisbech && tower.District.charAt(0) === 'W') {
+    if (!this.wisbech && tower.district === 'W') {
         show = 0;
     }
 
     if (show) {
         layer.addTo(tower_layer);
-        //console.log('Showing ' + tower.Place);
+        //console.log('Showing ' + tower.place);
     }
     else {
         layer.removeFrom(tower_layer);
-        //console.log('Hiding ' + tower.Place);
+        //console.log('Hiding ' + tower.place);
     }
 
 }
@@ -385,9 +384,10 @@ function filter_towers() {
 }
 
 
-function tower_as_text(tower) {
+function tower_as_text(feature) {
 
     var result = '';
+    var tower = feature.properties
 
     result += `<h1>${tower.place} - ${tower.dedication}</h1>`;
 
@@ -425,20 +425,32 @@ function tower_as_text(tower) {
         result += `<tr><th align="right" valign="top">Grid:</th><td valign="top">${tower['os_grid']}</td></tr>`;
     }
 
-    if (tower.Lat && tower.Lng) {
-        result += `<tr><th align="right" valign="top">Lat, Lng:</th><td valign="top">${tower['Lat']}, ${tower['Lng']}</td></tr>`;
+    if (feature.geometry.coordinates) {
+        result += `<tr><th align="right" valign="top">Lat, Lng:</th><td valign="top">${feature.geometry.coordinates[1]}, ${feature.geometry.coordinates[0]}</td></tr>`;
     }
 
-    if (tower.Secretary) {
-        result += `<tr><th align="right" valign="top">Secretary:</th><td valign="top">${tower['Secretary']}</td></tr>`;
-    }
+    if (tower.primary_contact) {
+        var contact = tower.primary_contact;
 
-    if (tower.Email) {
-        result += `<tr><th align="right" valign="top">Email:</th><td valign="top"><a href="mailto:${tower['Email']}">${tower['Email']}</a></td></tr>`;
-    }
+        if (contact.title || contact.forename || contact.name) {
+            result += `<tr><th align="right" valign="top">Secretary:</th><td valign="top">${[contact.title, contact.forename, contact.name].join(' ')}`;
+            if (contact.role === 'BL') {
+                result += ' (Bells Only)';
+            }
+            if (contact.role === 'BA') {
+                result += ' (Band Only)';
+            }
+            result += '</td></tr>';
+        }
 
-    if (tower.Phone) {
-        result += `<tr><th align="right" valign="top">Telephone:</th><td valign="top">${tower['Phone']}</td></tr>`;
+        if (contact.email) {
+            result += `<tr><th align="right" valign="top">Email:</th><td valign="top"><a href="mailto:${contact.email}">${contact.email}</a></td></tr>`;
+        }
+
+        if (contact.phone1 || contact.phone2) {
+            result += `<tr><th align="right" valign="top">Telephone:</th><td valign="top">${[contact.phone1, contact.phone2].filter((word) => word).join(' / ')}</td></tr>`;
+        }
+
     }
 
     var rpt;
@@ -456,8 +468,14 @@ function tower_as_text(tower) {
         result += `<p>${tower['notes']}</p>`;
     }
 
-    if (tower.Website) {
-        result += `<p><a href="${tower['Website']}">Website</a></p>`;
+    if (tower.websites) {
+        result += '<p>'
+        for (var i = 0; i < tower.websites.length; i++) {
+            var website = tower.websites[i];
+            var link_text = website.link_text || 'Website';
+            result += `<a href="${website.url}">${link_text}</a> `;
+        }
+        result += '</p>'
     }
 
     return result;
@@ -541,17 +559,17 @@ function load_tower_data(map) {
     }
 
     function create_marker(feature, latlng) {
-        var icon = make_icon(feature.properties.district, feature.properties.bells, feature.properties.ringing_statuss);
+        var icon = make_icon(feature.properties.district, feature.properties.bells, feature.properties.ringing_status);
         return L.marker(latlng, { icon: icon });
     }
 
 
     function add_popup(feature, layer) {
-        var name = feature.properties.Place;
+        var name = feature.properties.place;
         if (feature.properties['Include dedication'] === 'Yes') {
-            name = `${feature.properties.Place} - ${feature.properties.Dedication}`;
+            name = `${feature.properties.place} - ${feature.properties.dedication}`;
         }
-        layer.bindPopup(tower_as_text(feature.properties))
+        layer.bindPopup(tower_as_text(feature))
             .bindTooltip(`<b>${name}</b><br>(click for more)`);
     }
 
