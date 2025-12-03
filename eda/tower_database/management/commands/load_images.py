@@ -42,6 +42,7 @@ class Command(BaseCommand):
                     f,
                     File(open(os.path.join(CACHE_DIR, f), 'rb'))
                 )
+                photo.alt_text = 'Tower photo'
                 photo.save()
 
                 update_change_reason(photo, "Image import from websites")
