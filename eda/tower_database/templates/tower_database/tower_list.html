@@ -63,4 +63,8 @@
 
     </table>
 
+{% if district %}
+<p>This district as <a href="{% url 'district_geojson' district %}">machine-readable GeoJSON</a></p>
+{% endif %}
+
 {% endblock %}

@@ -65,7 +65,7 @@ L.Control.EdaMap = L.Control.extend({
         // Check boxes
 
         var checkbox = [
-            { id: 'unringable', label: 'Include unrigable towers', checked: false },
+            { id: 'unringable', label: 'Include towers with no ringing', checked: false },
             { id: 'cambridge', label: 'Include Cambridge District', checked: true, district: true  },
             { id: 'ely', label: 'Include Ely District', checked: true, district: true  },
             { id: 'huntingdon', label: 'Include Huntngdon District', checked: true, district: true },

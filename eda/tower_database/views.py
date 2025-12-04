@@ -37,16 +37,13 @@ class SingleDistrictListView(ListView):
 
     def get_queryset(self):
         district = self.kwargs["d"]
-        table = {}
-        for key, name in Tower.Districts.choices:
-            table[name.lower()] = key
-        if district not in table:
-            raise Http404("Unrecognised District")
-        return Tower.objects.filter(district=table[district]).order_by('place', 'dedication')
+        return Tower.objects.filter(district=district).order_by('place', 'dedication')
 
     def get_context_data(self, **kwargs):
+        district = self.kwargs["d"]
         context = super().get_context_data(**kwargs)
-        context["title"] = f'Towers in the {self.kwargs["d"].capitalize()} District'
+        context["title"] = f'Towers in the {Tower.Districts(district).label} District'
+        context["district"] = district
         return context
 
 
@@ -159,25 +156,28 @@ def tower_as_geojson(tower):
 
 
 @cache_page(None)
-def geojson(request, pk=None):
+def geojson(request, pk=None, d=None):
 
     logger.info('Rebuilding the GeoJSONson page')
 
     if pk:
         tower = get_object_or_404(Tower, pk=pk)
         result = tower_as_geojson(tower)
-        filename = f'tower-{pk}.geojson'
+
+    elif d:
+        features = []
+        for tower in Tower.objects.filter(district=d).prefetch_related('contact_set', 'website_set', 'photo_set'):
+            features.append(tower_as_geojson(tower))
+        result = FeatureCollection(features)
 
     else:
         features = []
         for tower in Tower.objects.prefetch_related('contact_set', 'website_set', 'photo_set'):
             features.append(tower_as_geojson(tower))
         result = FeatureCollection(features)
-        filename = 'towers.geojson'
 
     response = HttpResponse(
         content_type='application/geo+json',
-        #headers={'Content-Disposition': f'attachment; filename="{filename}"'},
     )
 
     dump(result, response)
