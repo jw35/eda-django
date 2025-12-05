@@ -2,8 +2,10 @@ from django.db import models
 from django.db.models.fields import Field
 from django.http import Http404, HttpResponse
 from django.shortcuts import render, redirect, get_object_or_404
+from django.templatetags.static import static
+from django.urls import reverse
 from django.views.decorators.cache import cache_page
-from django.views.generic import ListView, DetailView
+from django.views.generic import TemplateView, ListView, DetailView
 
 from geojson import Point, Feature, FeatureCollection, dump
 
@@ -36,11 +38,11 @@ class DistrictListView(ListView):
 class SingleDistrictListView(ListView):
 
     def get_queryset(self):
-        district = self.kwargs["d"]
+        district = self.kwargs["district"]
         return Tower.objects.filter(district=district).order_by('place', 'dedication')
 
     def get_context_data(self, **kwargs):
-        district = self.kwargs["d"]
+        district = self.kwargs["district"]
         context = super().get_context_data(**kwargs)
         context["title"] = f'Towers in the {Tower.Districts(district).label} District'
         context["district"] = district
@@ -95,6 +97,28 @@ class TowerDetailView(DetailView):
             self.request.user.groups.filter(name=admin_group).exists()
         )
 
+        return context
+
+
+class MapView(TemplateView):
+    template_name = 'tower_database/map.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+
+        # Build config to pass to the map JavaScript
+        map_config = { "static_root": static('tower_database/map') }
+        if 'towerid' in context:
+            map_config["towerid"] = context['towerid']
+            # All towers, so we can optionally display them
+            map_config["towers_json"] = reverse('towers_geojson')
+        elif 'district' in context:
+            map_config["district"] = context['district']
+            map_config["towers_json"] = reverse('district_geojson', kwargs={'district': context['district']})
+        else:
+            map_config["towers_json"] = reverse('towers_geojson')
+        context['map_config'] = map_config
+        
         return context
 
 
@@ -156,17 +180,17 @@ def tower_as_geojson(tower):
 
 
 @cache_page(None)
-def geojson(request, pk=None, d=None):
+def geojson(request, towerid=None, district=None):
 
     logger.info('Rebuilding the GeoJSONson page')
 
-    if pk:
-        tower = get_object_or_404(Tower, pk=pk)
+    if towerid:
+        tower = get_object_or_404(Tower, pk=towerid)
         result = tower_as_geojson(tower)
 
-    elif d:
+    elif district:
         features = []
-        for tower in Tower.objects.filter(district=d).prefetch_related('contact_set', 'website_set', 'photo_set'):
+        for tower in Tower.objects.filter(district=district).prefetch_related('contact_set', 'website_set', 'photo_set'):
             features.append(tower_as_geojson(tower))
         result = FeatureCollection(features)
 

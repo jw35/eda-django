@@ -16,12 +16,8 @@
     src="https://code.jquery.com/jquery-3.6.3.min.js"
     integrity="sha256-pvPw+upLPUjgMXY0G+8O0xUf+/Im1MZjXxxgOcBQBXU="
     crossorigin="anonymous"></script>
-    <script
-        src="{% static 'tower_database/map/map.js' %}"
-        data-static_root="{% static 'tower_database/map' %}"
-        data-towers_json="{% url 'towers_geojson' %}"
-        data-div_id="map">
-    </script>
+    <script src="{% static 'tower_database/map/map.js' %}"></script>
+    {{ map_config|json_script:"map_config"}}
 {% endblock %}
 
 {% block content %}

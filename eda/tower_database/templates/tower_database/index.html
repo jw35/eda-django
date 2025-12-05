@@ -2,16 +2,14 @@
 
 	<ul>
 
-		<li><a href="{% url 'map' %}">Map</a></li>
-
-		<li><a href="{% url 'tower_list' %}">All towers</a></li>
+		<li><a href="{% url 'tower_list' %}">All towers</a> (and as a <a href="{% url 'towers_map' %}">Map</a>)</li>
 
 		<li><a href="{% url 'district_list' %}">All towers by District</a>
 			<ul>
-				<li><a href="{% url 'single_district_list' d='C' %}">Just Cambridge</a></li>
-				<li><a href="{% url 'single_district_list' d='E' %}">Just Ely</a></li>
-				<li><a href="{% url 'single_district_list' d='H' %}">Just Huntingdon</a></li>
-				<li><a href="{% url 'single_district_list' d='W' %}">Just Wisbech</a></li>
+				<li><a href="{% url 'single_district_list' district='C' %}">Just Cambridge</a> (and on a <a href="{% url 'district_map' district='C' %}">Map</a>)</li>
+				<li><a href="{% url 'single_district_list' district='E' %}">Just Ely (and on a <a href="{% url 'district_map' district='E' %}">Map</a>)</a></li>
+				<li><a href="{% url 'single_district_list' district='H' %}">Just Huntingdon (and on a <a href="{% url 'district_map' district='H' %}">Map</a>)</a></li>
+				<li><a href="{% url 'single_district_list' district='W' %}">Just Wisbech (and on a <a href="{% url 'district_map' district='W' %}">Map</a>)</a></li>
 			</ul>
 		</li>
 		<li><a href="{% url 'bells_list' %}">Towers rung full-circle, by number of bells</a></li>

@@ -108,12 +108,8 @@ L.control.edaMAp = function(opts) {
     return new L.Control.EdaMap(opts);
 };
 
-const data = document.currentScript.dataset;
-const static_root = data.static_root;
-const towers_json = data.towers_json;
-const div_id = data.div_id;
-
 var map;
+var map_config;
 
 var tower_layer = L.featureGroup([], {
     attribution: 'Tower data &copy; <a href="https://elyda.org.uk/">Ely Diocesan Association</a>'
@@ -154,7 +150,7 @@ const overlays = {
     {
         name: 'Parishes',
         show: false,
-        url: `${static_root}/Parishes.geojson`,
+        file: 'Parishes.geojson',
         layer: L.geoJSON(null,
             {
                 pane: 'parish_boundary',
@@ -176,7 +172,7 @@ const overlays = {
     {
         name: 'Deaneries',
         show: false,
-        url: `${static_root}/Deaneries.geojson`,
+        file: 'Deaneries.geojson',
         layer: L.geoJSON(null,
             {
                 pane: 'parish_boundary',
@@ -197,7 +193,7 @@ const overlays = {
     {
         name: 'Benifices',
         show: false,
-        url: `${static_root}/Benifices.geojson`,
+        file: 'Benifices.geojson',
         layer: L.geoJSON(null,
             {
                 pane: 'benifice_boundary',
@@ -219,7 +215,7 @@ const overlays = {
     {
         name: 'Counties',
         show: false,
-        url: `${static_root}/BoundaryCeremonial.geojson`,
+        file: 'BoundaryCeremonial.geojson',
         layer: L.geoJSON(null,
             {
                 pane: 'county_boundary',
@@ -238,7 +234,7 @@ const overlays = {
     {
         name: 'Association',
         show: true,
-        url: `${static_root}/Association.geojson`,
+        file: 'Association.geojson',
         layer: L.geoJSON(null,
             {
                 pane: 'association_boundary',
@@ -259,7 +255,7 @@ const overlays = {
     {
         name: 'Districts',
         show: true,
-        url: `${static_root}/Districts.geojson`,
+        file: 'Districts.geojson',
         layer: L.geoJSON(null,
             {
                 pane: 'association_boundary',
@@ -288,7 +284,7 @@ function make_icon(district, bells, status) {
         suffix = 'u';
     }
 
-    var url = `${static_root}/Markers/${prefix}${bells}${suffix}.png`;
+    var url = `${map_config.static_root}/Markers/${prefix}${bells}${suffix}.png`;
     /* var shadow_url = 'https://cambridgeringing.info/images/shadow.png'; */
 
     return L.icon({
@@ -523,10 +519,12 @@ function load_boundary_data() {
 
     for (let [name, overlay] of Object.entries(overlays)) {
 
-        $.ajax({url: overlay.url, dataType: 'json'}
+        var url = `${map_config.static_root}/${overlay.file}`
+
+        $.ajax({url: url, dataType: 'json'}
         ).done(
             function (data) {
-                console.log('Loading ' + name + ' ' + overlay.url);
+                console.log('Loading ' + name + ' ' + url);
                 overlay.layer.addData(data);
                 if (overlay.add_to) {
                     overlay.layer.addTo(overlay.add_to);
@@ -577,12 +575,13 @@ function load_tower_data(map) {
             .bindTooltip(`<b>${name}</b><br>(click for more)`);
     }
 
-    var url = towers_json;
+    var url = map_config.towers_json;
+    console.log('Loading towers from ' + url);
 
     $.ajax({url: url, dataType: 'json'}
     ).done(
         function (data) {
-            console.log('Loading ' + url);
+            console.log('Read towers from ' + url);
             hidden_tower_layer = L.geoJSON(
                 data,
                 {   pane: 'towers',
@@ -621,7 +620,11 @@ function setup_panes(map) {
 
 $(document).ready(function () {
 
-    map = L.map(div_id, {minZoom: 8, zoomSnap: 0.25, zoomDelta: 0.5});
+    map_config = JSON.parse(
+        document.getElementById('map_config').textContent
+    );
+
+    map = L.map('map', {minZoom: 8, zoomSnap: 0.25, zoomDelta: 0.5});
 
     setup_panes(map);
 
