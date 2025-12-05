@@ -2,19 +2,36 @@
 
 	<ul>
 
-		<li><a href="{% url 'tower_list' %}">All towers</a> (and as a <a href="{% url 'towers_map' %}">Map</a>)</li>
+		<li><a href="{% url 'tower_list' %}">All towers</a>
+			(and as a <a href="{% url 'towers_map' %}">Map</a>,
+		     and as <a href="{% url 'towers_geojson' %}">machine-readable GeoJSON</a>)</li>
 
-		<li><a href="{% url 'district_list' %}">All towers by District</a>
+		<li><a href="{% url 'district_list' %}">All towers, by District</a>
 			<ul>
-				<li><a href="{% url 'single_district_list' district='C' %}">Just Cambridge</a> (and on a <a href="{% url 'district_map' district='C' %}">Map</a>)</li>
-				<li><a href="{% url 'single_district_list' district='E' %}">Just Ely (and on a <a href="{% url 'district_map' district='E' %}">Map</a>)</a></li>
-				<li><a href="{% url 'single_district_list' district='H' %}">Just Huntingdon (and on a <a href="{% url 'district_map' district='H' %}">Map</a>)</a></li>
-				<li><a href="{% url 'single_district_list' district='W' %}">Just Wisbech (and on a <a href="{% url 'district_map' district='W' %}">Map</a>)</a></li>
+
+				<li><a href="{% url 'single_district_list' district='C' %}">Just Cambridge</a>
+					(and on a <a href="{% url 'district_map' district='C' %}">Map</a>,
+				     and as <a href="{% url 'district_geojson' district='C' %}">machine-readable GeoJSON</a>)
+				</li>
+
+				<li><a href="{% url 'single_district_list' district='E' %}">Just Ely</a>
+					(and on a <a href="{% url 'district_map' district='E' %}">Map</a>,
+				     and as <a href="{% url 'district_geojson' district='E' %}">machine-readable GeoJSON</a>)
+				</li>
+
+				<li><a href="{% url 'single_district_list' district='H' %}">Just Huntingdon</a>
+					(and on a <a href="{% url 'district_map' district='H' %}">Map</a>,
+				     and as <a href="{% url 'district_geojson' district='H' %}">machine-readable GeoJSON</a>)
+				</li>
+
+				<li><a href="{% url 'single_district_list' district='W' %}">Just Wisbech</a>
+					(and on a <a href="{% url 'district_map' district='W' %}">Map</a>,
+					 and as <a href="{% url 'district_geojson' district='W' %}">machine-readable GeoJSON</a>)
+			    </li>
+
 			</ul>
 		</li>
 		<li><a href="{% url 'bells_list' %}">Towers rung full-circle, by number of bells</a></li>
 		<li><a href="{% url 'un_bells_list' %}">Towewrs not rung full-circle, by number of bells</a></li>
 		<li><a href="{% url 'practice_night_list' %}">Towers by practice night</a></li>
 	</ul>
-
-	<p>Also all towers as <a href="{% url 'towers_geojson' %}">machine-readable GeoJSON</a>.</p>
