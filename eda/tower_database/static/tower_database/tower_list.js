@@ -29,13 +29,18 @@ var dt_options = {
         }
     },
     columnDefs: [
-    	// Disable the seachPane for Dedication
+    	// Disable the seachPane for Dedication, ordering & searching for map links
     	{
             target: 1,
             searchPanes: {
                 show: false
             },
-        }
+        },
+        {
+            target: 5,
+            orderable: false,
+            searchable: false,
+        },
     ]
 };
 

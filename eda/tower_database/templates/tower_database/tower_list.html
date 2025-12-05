@@ -40,6 +40,7 @@
                 <td class="fw-bold">Bells</td>
                 <td class="fw-bold">Ringing status</td>
                 <td class="fw-bold">District</td>
+                <td class="fw-bold"></td>
             </tr>
         </thead>
 
@@ -54,6 +55,7 @@
             <td>{{ tower.bells }}</td>
             <td>{{ tower.get_ringing_status_display }}</td>
             <td>{{ tower.get_district_display }}</td>
+            <td><a href="{% url 'tower_map' towerid=tower.pk %}">Map</a></td>
 
         </tr>
 
