@@ -343,7 +343,13 @@ function bring_to_top(towerid) {
     if (towerid) {
         tower_layer.eachLayer(function (layer) {
             if (layer.feature.id === towerid) {
-                layer.setZIndexOffset(1000)
+                layer.setZIndexOffset(1000);
+                console.log(layer);
+                var popup = layer.getPopup();
+                console.log(popup);
+                popup.options.autoClose = false;
+                popup.options.closeOnClick = false;
+                layer.openPopup();
             }
         });
     }
@@ -587,17 +593,20 @@ function load_tower_data(map) {
     function create_marker(feature, latlng) {
         var selected = map_config.towerid && (feature.id === map_config.towerid);
         var icon = make_icon(feature.properties.district, feature.properties.bells, feature.properties.ringing_status, selected);
-        return L.marker(latlng, { icon: icon });
+        var name = feature.properties.place;
+        if (feature.properties['include_dedication']) {
+            name = `${feature.properties.place} - ${feature.properties.dedication}`;
+        }
+        return L.marker(latlng, { icon: icon, title: name });
     }
 
 
     function add_popup(feature, layer) {
         var name = feature.properties.place;
-        if (feature.properties['Include dedication'] === 'Yes') {
+        if (feature.properties['include_dedication']) {
             name = `${feature.properties.place} - ${feature.properties.dedication}`;
         }
-        layer.bindPopup(tower_as_text(feature))
-            .bindTooltip(`<b>${name}</b><br>(click for more)`);
+        layer.bindPopup(tower_as_text(feature));
         if (map_config.towerid && map_config.towerid === feature.id) {
             map.setView([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], 12);
         }
