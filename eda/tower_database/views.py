@@ -134,6 +134,7 @@ def tower_as_geojson(tower):
             properties[field.name] = getattr(tower, field.name)
         # OS Grid isn't actually a field...
         properties['os_grid'] = tower.os_grid
+        properties['url'] = tower.get_absolute_url()
 
     # Tower primary contact, if available and publishable
     primary_c = {}

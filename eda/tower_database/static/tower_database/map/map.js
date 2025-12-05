@@ -474,6 +474,8 @@ function tower_as_text(feature) {
         result += `<p>${tower['notes']}</p>`;
     }
 
+    result += `<p><a href="${tower.url}">More details</a></p>`
+
     if (tower.websites) {
         result += '<p>'
         for (var i = 0; i < tower.websites.length; i++) {
