@@ -65,11 +65,8 @@ L.Control.EdaMap = L.Control.extend({
         // Check boxes
 
         var checkbox = [
+            { id: 'all', label: 'Show other towers', checked: false},
             { id: 'unringable', label: 'Include towers with no ringing', checked: false },
-            { id: 'cambridge', label: 'Include Cambridge District', checked: true, district: true  },
-            { id: 'ely', label: 'Include Ely District', checked: true, district: true  },
-            { id: 'huntingdon', label: 'Include Huntngdon District', checked: true, district: true },
-            { id: 'wisbech', label: 'Include Wisbech District', checked: true, district: true  },
             { id: 'parish', label: 'Show parish boundaries', checked: false },
             { id: 'benifice', label: 'Show benifice boundaries', checked: false },
             { id: 'county', label: 'Show county boundaries', checked: false },
@@ -81,11 +78,9 @@ L.Control.EdaMap = L.Control.extend({
             L.DomUtil.addClass(box, 'filter_control');
             box.type = 'checkbox';
             box.id = checkbox[i]['id'];
-            if (checkbox[i]['district'] && location.search && location.search !== `?${checkbox[i]['id']}`) {
-                box.defaultChecked = false;
-            }
-            else {
-                box.defaultChecked = checkbox[i]['checked'];
+            // Hide the all checkbox except on a single tower map
+            if (checkbox[i]['id'] === 'all' && !map_config.towerid) {
+                    checkbox_div.hidden = true
             }
 
             checkbox_div.innerHTML += checkbox[i]['label'];
@@ -249,7 +244,6 @@ const overlays = {
             }
         ),
         add_to: association_fg,
-        fit_bounds: true
     },
     districts:
     {
@@ -273,7 +267,7 @@ const overlays = {
     },
 };
 
-function make_icon(district, bells, status) {
+function make_icon(district, bells, status, selected) {
 
     var prefix = district.charAt(0).toUpperCase();
     var suffix = 'p';
@@ -287,14 +281,19 @@ function make_icon(district, bells, status) {
     var url = `${map_config.static_root}/Markers/${prefix}${bells}${suffix}.png`;
     /* var shadow_url = 'https://cambridgeringing.info/images/shadow.png'; */
 
+    var size = 36;
+    if (selected) {
+        size = 54;
+    }
+
     return L.icon({
         iconUrl: url,
-        iconSize: [36, 36],
-        iconAnchor: [18, 36],
+        iconSize: [size, size],
+        iconAnchor: [size/2, size],
         /*shadowUrl: shadow_url,
         shadowSize: [53, 29],
         shadowAnchor: [12, 25],*/
-        popupAnchor: [0, -33],
+        popupAnchor: [0, -size],
         tooltipAnchor: [8, -27]
     });
 
@@ -310,33 +309,43 @@ function toggle_display(layer) {
         show = 0;
     }
     else if (this.limit_type === '>' && tower.bells < parseInt(this.limit_number)) {
-        show =0;
+        show = 0;
     }
 
     if (!this.unringable && tower.ringing_status === 'N') {
         show = 0;
     }
 
-    if (!this.cambridge && tower.district === 'C') {
-        show = 0;
-    }
-    if (!this.ely && tower.district === 'E') {
-        show = 0;
-    }
-    if (!this.huntingdon && tower.district === 'H') {
-        show = 0;
-    }
-    if (!this.wisbech && tower.district === 'W') {
-        show = 0;
+    // Given a selected tower, always show it but show nothing else
+    // unless 'all' is set
+    if (map_config.towerid) {
+        if (!this.all) {
+            show = 0;
+        }
+        if (map_config.towerid === layer.feature.id) {
+            show = 1;
+        }
     }
 
     if (show) {
         layer.addTo(tower_layer);
-        //console.log('Showing ' + tower.place);
     }
     else {
         layer.removeFrom(tower_layer);
-        //console.log('Hiding ' + tower.place);
+    }
+
+}
+
+function bring_to_top(towerid) {
+
+    // Bring the layer with id=towerid to the top
+
+    if (towerid) {
+        tower_layer.eachLayer(function (layer) {
+            if (layer.feature.id === towerid) {
+                layer.setZIndexOffset(1000)
+            }
+        });
     }
 
 }
@@ -344,21 +353,15 @@ function toggle_display(layer) {
 
 function filter_towers() {
 
-    console.log('Running filter_towers()');
-
     var context = {
         limit_type: document.getElementById('bell_type').value,
         limit_number: document.getElementById('bell_number').value,
+        all: document.getElementById('all').checked,
         unringable: document.getElementById('unringable').checked,
-        cambridge: document.getElementById('cambridge').checked,
-        ely: document.getElementById('ely').checked,
-        huntingdon: document.getElementById('huntingdon').checked,
-        wisbech: document.getElementById('wisbech').checked,
     };
 
-    console.log(context);
-
     hidden_tower_layer.eachLayer(toggle_display, context);
+    bring_to_top(map_config.towerid);
 
     if (document.getElementById('parish').checked) {
         parishes_fg.addTo(map);
@@ -515,6 +518,26 @@ function benifice_as_text(benifice) {
 
 }
 
+function set_bounds(name, overlay) {
+
+    // Set the map to display just the district if displaying a district
+    // and the entire association otherwise
+
+    if (map_config.district) {
+        if (name == 'districts') {
+            overlay.layer.eachLayer(function (layer) {
+                if (layer.feature.properties.District === map_config.district) {
+                    map.fitBounds(layer.getBounds());
+                }
+            });
+        }
+    }
+    else if (name === 'association') {
+        map.fitBounds(overlay.layer.getBounds(), {paddingTopLeft: [-20, -20], paddingBottomRight: [-20, -20]});
+    }
+
+}
+
 function load_boundary_data() {
 
     for (let [name, overlay] of Object.entries(overlays)) {
@@ -524,14 +547,11 @@ function load_boundary_data() {
         $.ajax({url: url, dataType: 'json'}
         ).done(
             function (data) {
-                console.log('Loading ' + name + ' ' + url);
                 overlay.layer.addData(data);
                 if (overlay.add_to) {
                     overlay.layer.addTo(overlay.add_to);
                 }
-                if (overlay.fit_bounds) {
-                    map.fitBounds(overlay.layer.getBounds(), {paddingTopLeft: [-20, -20], paddingBottomRight: [-20, -20]});
-                }
+                set_bounds(name, overlay);
             }
         ).fail(
             function (ignore, ignore1, error_thrown) {
@@ -561,7 +581,8 @@ function load_tower_data(map) {
     }
 
     function create_marker(feature, latlng) {
-        var icon = make_icon(feature.properties.district, feature.properties.bells, feature.properties.ringing_status);
+        var selected = map_config.towerid && (feature.id === map_config.towerid);
+        var icon = make_icon(feature.properties.district, feature.properties.bells, feature.properties.ringing_status, selected);
         return L.marker(latlng, { icon: icon });
     }
 
@@ -576,12 +597,10 @@ function load_tower_data(map) {
     }
 
     var url = map_config.towers_json;
-    console.log('Loading towers from ' + url);
 
     $.ajax({url: url, dataType: 'json'}
     ).done(
         function (data) {
-            console.log('Read towers from ' + url);
             hidden_tower_layer = L.geoJSON(
                 data,
                 {   pane: 'towers',
