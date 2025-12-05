@@ -523,6 +523,10 @@ function set_bounds(name, overlay) {
     // Set the map to display just the district if displaying a district
     // and the entire association otherwise
 
+    if (map_config.towerid) {
+        return;
+    }
+
     if (map_config.district) {
         if (name == 'districts') {
             overlay.layer.eachLayer(function (layer) {
@@ -594,6 +598,9 @@ function load_tower_data(map) {
         }
         layer.bindPopup(tower_as_text(feature))
             .bindTooltip(`<b>${name}</b><br>(click for more)`);
+        if (map_config.towerid && map_config.towerid === feature.id) {
+            map.setView([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], 12);
+        }
     }
 
     var url = map_config.towers_json;
