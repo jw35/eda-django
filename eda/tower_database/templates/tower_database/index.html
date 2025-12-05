@@ -3,30 +3,30 @@
 	<ul>
 
 		<li><a href="{% url 'tower_list' %}">All towers</a>
-			(and as a <a href="{% url 'towers_map' %}">Map</a>,
-		     and as <a href="{% url 'towers_geojson' %}">machine-readable GeoJSON</a>)</li>
+			(and as a <a href="{% url 'towers_map' %}">map</a>,
+		     and <a href="{% url 'towers_geojson' %}">machine-readable</a>)</li>
 
 		<li><a href="{% url 'district_list' %}">All towers, by District</a>
 			<ul>
 
 				<li><a href="{% url 'single_district_list' district='C' %}">Just Cambridge</a>
-					(and on a <a href="{% url 'district_map' district='C' %}">Map</a>,
-				     and as <a href="{% url 'district_geojson' district='C' %}">machine-readable GeoJSON</a>)
+					(and on a <a href="{% url 'district_map' district='C' %}">map</a>,
+				     and <a href="{% url 'district_geojson' district='C' %}">machine-readable</a>)
 				</li>
 
 				<li><a href="{% url 'single_district_list' district='E' %}">Just Ely</a>
-					(and on a <a href="{% url 'district_map' district='E' %}">Map</a>,
-				     and as <a href="{% url 'district_geojson' district='E' %}">machine-readable GeoJSON</a>)
+					(and on a <a href="{% url 'district_map' district='E' %}">map</a>,
+				     and <a href="{% url 'district_geojson' district='E' %}">machine-readable</a>)
 				</li>
 
 				<li><a href="{% url 'single_district_list' district='H' %}">Just Huntingdon</a>
-					(and on a <a href="{% url 'district_map' district='H' %}">Map</a>,
-				     and as <a href="{% url 'district_geojson' district='H' %}">machine-readable GeoJSON</a>)
+					(and on a <a href="{% url 'district_map' district='H' %}">map</a>,
+				     and <a href="{% url 'district_geojson' district='H' %}">machine-readable </a>)
 				</li>
 
 				<li><a href="{% url 'single_district_list' district='W' %}">Just Wisbech</a>
-					(and on a <a href="{% url 'district_map' district='W' %}">Map</a>,
-					 and as <a href="{% url 'district_geojson' district='W' %}">machine-readable GeoJSON</a>)
+					(and on a <a href="{% url 'district_map' district='W' %}">map</a>,
+					 and <a href="{% url 'district_geojson' district='W' %}">machine-readable</a>)
 			    </li>
 
 			</ul>
