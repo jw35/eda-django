@@ -342,11 +342,6 @@ function toggle_display(layer) {
         layer.removeFrom(tower_layer);
     }
 
-    // If we are displaying one tower and this is it then open the popup
-    if (map_config.towerid && (map_config.towerid === layer.feature.id)) {
-       layer.openPopup();
-    }
-
 }
 
 
@@ -598,16 +593,24 @@ function load_tower_data(map) {
 
     }
 
+    function show_popup() {
+        // If we are displaying one tower, force it'd popup to be displayed initially
+        if (map_config.towerid) {
+            hidden_tower_layer.eachLayer(function (layer) {
+                if (layer.feature.id === map_config.towerid) {
+                    layer.openPopup();
+                }
+            });
+        }
+    }
+
     function add_popup(feature, layer) {
         layer.bindPopup(tower_as_text(feature)).getPopup();
         var popup = layer.getPopup();
         if (map_config.towerid && map_config.towerid === feature.id) {
             layer.setZIndexOffset(1000);
-            console.log(layer);
-            console.log(popup);
             popup.options.autoClose = false;
             popup.options.closeOnClick = false;
-            popup.openPopup();
         }
     }
 
@@ -624,6 +627,7 @@ function load_tower_data(map) {
                 }
             );
             filter_towers();
+            show_popup();
             setup_tower_listeners();
         }
     ).fail(
