@@ -8,101 +8,10 @@
 
 'use strict';
 
-L.Control.EdaMap = L.Control.extend({
-    onAdd: function(map) {
+// Put the whole script into an IEF
+(function() {
 
-        const classname = 'leaflet-control-edamap';
-
-        var i;
-
-        var container = L.DomUtil.create('div', `${classname}`);
-        L.DomUtil.addClass(container, 'leaflet-control');
-
-        L.DomEvent.disableClickPropagation(container);
-        L.DomEvent.disableScrollPropagation(container);
-
-        // Number of bells
-
-        var div = L.DomUtil.create('div', `${classname}-div`, container);
-        div.innerHTML = 'Towers with ';
-
-        //    exactly or at least
-
-        var select1 = L.DomUtil.create('select', `${classname}-select`, div);
-        select1.id = 'bell_type';
-        L.DomUtil.addClass(select1, 'filter_control');
-        L.DomEvent.on(select1, 'change', this._onchange, container);
-
-        var opt1 = L.DomUtil.create('option', `${classname}-option`, select1);
-        opt1.value = '>';
-        opt1.defaultSelected = true;
-        opt1.innerHTML = 'at least';
-
-        var opt2 = L.DomUtil.create('option', `${classname}-option`, select1);
-        opt2.value = '=';
-        opt2.innerHTML = 'exactly';
-
-        div.innerHTML += '  ';
-
-        //    number
-
-        var select2 = L.DomUtil.create('select', `${classname}-select`, div);
-        select2.id = 'bell_number';
-        L.DomUtil.addClass(select2, 'filter_control');
-
-        var choices = ['3', '4', '5', '6', '8', '10', '12'];
-        for (i = 0; i < choices.length; i++) {
-            var opt = L.DomUtil.create('option', `${classname}-option`, select2);
-            opt.value = choices[i];
-            opt.innerHTML = choices[i];
-            if (choices[i] === '5') {
-                opt.defaultSelected = true;
-            }
-        }
-
-        div.innerHTML += ' bells';
-
-        // Check boxes
-
-        var checkbox = [
-            { id: 'all', label: 'Show other towers', checked: false},
-            { id: 'unringable', label: 'Include towers with no ringing', checked: false },
-            { id: 'parish', label: 'Show parish boundaries', checked: false },
-            { id: 'benifice', label: 'Show benifice boundaries', checked: false },
-            { id: 'county', label: 'Show county boundaries', checked: false },
-        ];
-
-        for (i = 0; i < checkbox.length; i++) {
-            var checkbox_div = L.DomUtil.create('div', `${classname}-div`, container);
-            var box = L.DomUtil.create('input', `${classname}-input`, checkbox_div);
-            L.DomUtil.addClass(box, 'filter_control');
-            box.type = 'checkbox';
-            box.id = checkbox[i]['id'];
-            // Hide the all checkbox except on a single tower map
-            if (checkbox[i]['id'] === 'all' && !map_config.towerid) {
-                    checkbox_div.hidden = true
-            }
-
-            checkbox_div.innerHTML += checkbox[i]['label'];
-        }
-
-        return container;
-
-    },
-
-    onRemove: function(map) {
-        // Nothing to do here
-    },
-
-    _onchange(container) {
-        console.log('On Change');
-    }
-});
-
-L.control.edaMAp = function(opts) {
-    return new L.Control.EdaMap(opts);
-};
-
+// Some 'globals
 var map;
 var map_config;
 
@@ -111,35 +20,9 @@ var tower_layer = L.featureGroup([], {
 });
 var hidden_tower_layer;
 
-function highlight_benifice(feature, layer) {
-    layer.on({
-        mouseover: function(e) { e.target.setStyle({fillOpacity: 0.6}); },
-        mouseout: function(e) { overlays.benifices.layer.resetStyle(); }
-    });
-    layer.bindPopup(benifice_as_text(feature.properties));
-}
-
-function highlight_parish(feature, layer) {
-    layer.bindPopup(parish_as_text(feature.properties));
-    layer.on({
-        mouseover: function(e) {
-            /* Highlight the parish itself  */
-            e.target.setStyle({fillOpacity: 0.1});
-            /* Find the corresponding Benefice and highlight that too */
-            overlays.benifices.layer.eachLayer(function (benifice) {
-                if (benifice.feature.properties.Benefice_Code === feature.properties.Benefice_Code) {
-                    benifice.setStyle({fillOpacity: 0.6});
-                }
-            });
-        },
-        mouseout: function(e) { overlays.parishes.layer.resetStyle(); overlays.benifices.layer.resetStyle(); }
-    });
-
-}
-
+// Overlay definitions
 var parishes_fg = L.featureGroup();
 var association_fg = L.featureGroup();
-
 const overlays = {
     parishes:
     {
@@ -267,8 +150,133 @@ const overlays = {
     },
 };
 
-function make_icon(district, bells, status, selected) {
 
+// Custom control fir map layers
+L.Control.EdaMap = L.Control.extend({
+    onAdd: function(map) {
+
+        const classname = 'leaflet-control-edamap';
+
+        var i;
+
+        var container = L.DomUtil.create('div', `${classname}`);
+        L.DomUtil.addClass(container, 'leaflet-control');
+
+        L.DomEvent.disableClickPropagation(container);
+        L.DomEvent.disableScrollPropagation(container);
+
+        // Number of bells
+
+        var div = L.DomUtil.create('div', `${classname}-div`, container);
+        div.innerHTML = 'Towers with ';
+
+        //    exactly or at least
+
+        var select1 = L.DomUtil.create('select', `${classname}-select`, div);
+        select1.id = 'bell_type';
+        L.DomUtil.addClass(select1, 'filter_control');
+        L.DomEvent.on(select1, 'change', this._onchange, container);
+
+        var opt1 = L.DomUtil.create('option', `${classname}-option`, select1);
+        opt1.value = '>';
+        opt1.defaultSelected = true;
+        opt1.innerHTML = 'at least';
+
+        var opt2 = L.DomUtil.create('option', `${classname}-option`, select1);
+        opt2.value = '=';
+        opt2.innerHTML = 'exactly';
+
+        div.innerHTML += '  ';
+
+        //    number
+
+        var select2 = L.DomUtil.create('select', `${classname}-select`, div);
+        select2.id = 'bell_number';
+        L.DomUtil.addClass(select2, 'filter_control');
+
+        var choices = ['3', '4', '5', '6', '8', '10', '12'];
+        for (i = 0; i < choices.length; i++) {
+            var opt = L.DomUtil.create('option', `${classname}-option`, select2);
+            opt.value = choices[i];
+            opt.innerHTML = choices[i];
+            if (choices[i] === '5') {
+                opt.defaultSelected = true;
+            }
+        }
+
+        div.innerHTML += ' bells';
+
+        // Check boxes
+
+        var checkbox = [
+            { id: 'all', label: 'Show other towers', checked: false},
+            { id: 'unringable', label: 'Include towers with no ringing', checked: false },
+            { id: 'parish', label: 'Show parish boundaries', checked: false },
+            { id: 'benifice', label: 'Show benifice boundaries', checked: false },
+            { id: 'county', label: 'Show county boundaries', checked: false },
+        ];
+
+        for (i = 0; i < checkbox.length; i++) {
+            var checkbox_div = L.DomUtil.create('div', `${classname}-div`, container);
+            var box = L.DomUtil.create('input', `${classname}-input`, checkbox_div);
+            L.DomUtil.addClass(box, 'filter_control');
+            box.type = 'checkbox';
+            box.id = checkbox[i]['id'];
+            // Hide the all checkbox except on a single tower map
+            if (checkbox[i]['id'] === 'all' && !map_config.towerid) {
+                    checkbox_div.hidden = true
+            }
+
+            checkbox_div.innerHTML += checkbox[i]['label'];
+        }
+
+        return container;
+
+    },
+
+    onRemove: function(map) {
+        // Nothing to do here
+    },
+
+    _onchange(container) {
+        console.log('On Change');
+    }
+});
+
+L.control.edaMAp = function(opts) {
+    return new L.Control.EdaMap(opts);
+};
+
+
+
+function highlight_benifice(feature, layer) {
+    layer.on({
+        mouseover: function(e) { e.target.setStyle({fillOpacity: 0.6}); },
+        mouseout: function(e) { overlays.benifices.layer.resetStyle(); }
+    });
+    layer.bindPopup(benifice_as_text(feature.properties));
+}
+
+function highlight_parish(feature, layer) {
+    layer.bindPopup(parish_as_text(feature.properties));
+    layer.on({
+        mouseover: function(e) {
+            /* Highlight the parish itself  */
+            e.target.setStyle({fillOpacity: 0.1});
+            /* Find the corresponding Benefice and highlight that too */
+            overlays.benifices.layer.eachLayer(function (benifice) {
+                if (benifice.feature.properties.Benefice_Code === feature.properties.Benefice_Code) {
+                    benifice.setStyle({fillOpacity: 0.6});
+                }
+            });
+        },
+        mouseout: function(e) { overlays.parishes.layer.resetStyle(); overlays.benifices.layer.resetStyle(); }
+    });
+
+}
+
+
+function make_icon(district, bells, status, selected) {
     var prefix = district.charAt(0).toUpperCase();
     var suffix = 'p';
     if (status === 'O') {
@@ -334,24 +342,9 @@ function toggle_display(layer) {
         layer.removeFrom(tower_layer);
     }
 
-}
-
-function bring_to_top(towerid) {
-
-    // Bring the layer with id=towerid to the top
-
-    if (towerid) {
-        tower_layer.eachLayer(function (layer) {
-            if (layer.feature.id === towerid) {
-                layer.setZIndexOffset(1000);
-                console.log(layer);
-                var popup = layer.getPopup();
-                console.log(popup);
-                popup.options.autoClose = false;
-                popup.options.closeOnClick = false;
-                layer.openPopup();
-            }
-        });
+    // If we are displaying one tower and this is it then open the popup
+    if (map_config.towerid && (map_config.towerid === layer.feature.id)) {
+       layer.openPopup();
     }
 
 }
@@ -367,7 +360,6 @@ function filter_towers() {
     };
 
     hidden_tower_layer.eachLayer(toggle_display, context);
-    bring_to_top(map_config.towerid);
 
     if (document.getElementById('parish').checked) {
         parishes_fg.addTo(map);
@@ -531,7 +523,7 @@ function set_bounds(name, overlay) {
     // Set the map to display just the district if displaying a district
     // and the entire association otherwise
 
-    if (map_config.towerid) {
+    if (map_config.centre) {
         return;
     }
 
@@ -593,24 +585,29 @@ function load_tower_data(map) {
     }
 
     function create_marker(feature, latlng) {
+
+        var properties = feature.properties;
         var selected = map_config.towerid && (feature.id === map_config.towerid);
-        var icon = make_icon(feature.properties.district, feature.properties.bells, feature.properties.ringing_status, selected);
+
+        var icon = make_icon(properties.district, properties.bells, properties.ringing_status, selected);
         var name = feature.properties.place;
         if (feature.properties['include_dedication']) {
             name = `${feature.properties.place} - ${feature.properties.dedication}`;
         }
         return L.marker(latlng, { icon: icon, title: name });
+
     }
 
-
     function add_popup(feature, layer) {
-        var name = feature.properties.place;
-        if (feature.properties['include_dedication']) {
-            name = `${feature.properties.place} - ${feature.properties.dedication}`;
-        }
-        layer.bindPopup(tower_as_text(feature));
+        layer.bindPopup(tower_as_text(feature)).getPopup();
+        var popup = layer.getPopup();
         if (map_config.towerid && map_config.towerid === feature.id) {
-            map.setView([feature.geometry.coordinates[1], feature.geometry.coordinates[0]], 12);
+            layer.setZIndexOffset(1000);
+            console.log(layer);
+            console.log(popup);
+            popup.options.autoClose = false;
+            popup.options.closeOnClick = false;
+            popup.openPopup();
         }
     }
 
@@ -663,6 +660,10 @@ $(document).ready(function () {
 
     map = L.map('map', {minZoom: 8, zoomSnap: 0.25, zoomDelta: 0.5});
 
+    if (map_config.centre) {
+        map.setView(map_config.centre, 12);
+    }
+
     setup_panes(map);
 
     L.control.edaMAp({ position: 'topright' }).addTo(map);
@@ -681,4 +682,8 @@ $(document).ready(function () {
     load_boundary_data();
 
 });
+
+// End of IEF
+
+})();
 

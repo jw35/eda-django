@@ -109,6 +109,8 @@ class MapView(TemplateView):
         # Build config to pass to the map JavaScript
         map_config = { "static_root": static('tower_database/map') }
         if 'towerid' in context:
+            tower = get_object_or_404(Tower, pk=context['towerid'])
+            map_config["centre"] = [tower.lat, tower.lng]
             map_config["towerid"] = context['towerid']
             # All towers, so we can optionally display them
             map_config["towers_json"] = reverse('towers_geojson')
@@ -118,7 +120,7 @@ class MapView(TemplateView):
         else:
             map_config["towers_json"] = reverse('towers_geojson')
         context['map_config'] = map_config
-        
+
         return context
 
 
