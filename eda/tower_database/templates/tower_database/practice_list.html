@@ -4,6 +4,19 @@
 
 {% block title %}{{ title }}{% endblock %}
 
+{% block extra_head %}
+    <link href="{% static 'tower_database/DataTables/datatables.min.css' %}" rel="stylesheet">
+{% endblock %}
+
+{% block extra_js %}
+    <script src="{% static 'tower_database/DataTables/datatables.min.js' %}"></script>
+    <script 
+        src="{% static 'tower_database/practice_list.js' %}"
+        data-table_id='tower_table'>
+    </script>
+{% endblock %}
+
+
 {% block content %}
 
 <div class="row justify-content-center">
@@ -12,25 +25,48 @@
 
 <h1>{{ title }}</h1>
 
-<p>We believe our listsWe include all towers with 3 or more bells within the area of the Diocese of Ely (not all of which owned and maintained by the Diocese itself).</p>
+<p>We believe our listsWe include all towers with 3 or more bells within the area of<br>
+the Diocese of Ely (not all of which owned and maintained by the Diocese itself).</p>
 
-<p>Towers marked in <i>italic</i> should be checked before travelling. Bracketed notes indicate the week of the month of the practice.</p>
+    <table id="tower_table" class="table table-responsive table-sm">
 
-<ul>
+        <thead>
+            <tr>
+                <td class="fw-bold">Day</td>
+                <td class="fw-bold">Day</td>
+                <td class="fw-bold">Place</td>
+                <td class="fw-bold">Bells</td>
+                <td class="fw-bold">District</td>
+                <td class="fw-bold"></td>
+            </tr>
+        </thead>
 
-	{% for tower in object_list %}
+        <tbody class="table-group-divider">
 
-		{% ifchanged %}</ul><h2>{{ tower.get_practice_day_display }}</h2><ul>{% endifchanged %}
+        {% for tower in object_list %}
 
-        <li>{% if tower.travel_check %}<i>{% endif %}<a href="{% url 'tower_detail' tower.id %}">{{ tower.district }}
-        {{ tower.place }}
-        {% if tower.include_dedication %}- {{ tower.dedication }}{% endif %}
-        {% if tower.practice_weeks %}({{ tower.practice_weeks|join:", " }}){% endif %}</a>{% if tower.travel_check %}</i>{% endif %}
-        </li>
+        <tr class="text-start">
 
-	{% endfor %}
+            <td>{{ tower.practice_day }}</td>
+            <td>{{ tower.get_practice_day_display }}
+            <td>
+                <b>
+                    <a href="{% url 'tower_detail' tower.id %}">{{ tower.place }}{% if tower.include_dedication %} - {{ tower.dedication }}{% endif %}</a>
+                </b>
+                {% if tower.practice_weeks %} ({{ tower.practice_weeks_text }}){% endif %}
+                {% if tower.travel_check %} (check){% endif %}
+            </td>
+            <td>{{ tower.bells }}</td>
+            <td>{{ tower.get_district_display }}</td>
+            <td><a href="{% url 'tower_map' towerid=tower.pk %}">Map</a></td>
 
-</ul>
+        </tr>
+
+        {% endfor %}
+
+        </tbody>
+
+    </table>
 
 </div>
 
