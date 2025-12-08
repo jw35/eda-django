@@ -199,6 +199,13 @@ class Tower(CacheInvalidayingModel):
         return reverse("tower_detail", kwargs={"pk": self.pk})
 
     @property
+    def practice_weeks_text(self):
+        n = ''
+        if 'not' in self.practice_weeks:
+            n = 'not '
+        return n + ', '.join([w for w in self.practice_weeks if w != 'not'])
+
+    @property
     def primary_contact(self):
         for contact in self.contact_set.all():
             if contact.primary:
