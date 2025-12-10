@@ -129,22 +129,21 @@ def tower_as_geojson(tower):
 
     point = Point((float(tower.lng), float(tower.lat)))
 
+    omit = ['id', 'latlng', 'maintainer_notes']
     properties = {}
-    
+
     # All (most) individual Tower fields
-    for  field in Tower._meta.get_fields():
-        if  isinstance(field, Field) and field.name not in ('id', 'latlng', 'maintainer_notes'):
-            properties[field.name] = getattr(tower, field.name)
-        # OS Grid isn't actually a field...
-        properties['os_grid'] = tower.os_grid
-        properties['url'] = tower.get_absolute_url()
+    for  name in [f.name for f in Tower._meta.fields if f.name not in omit]:
+        properties[name] = getattr(tower, name)
+    # OS Grid and url aren't actually fields...
+    properties['os_grid'] = tower.os_grid
+    properties['url'] = tower.get_absolute_url()
 
     # Tower primary contact, if available and publishable
     primary_c = {}
     if tower.primary_contact and tower.primary_contact.publish:
-        for  field in Contact._meta.get_fields():
-            if  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
-                primary_c[field.name] = getattr(tower.primary_contact, field.name)
+        for  name in [f.name for f in Contact._meta.fields if f.name != 'tower']:
+            primary_c[name] = getattr(tower.primary_contact, name)
     properties['primary_contact'] = primary_c
 
     # All other Tower contacts, if publishable
@@ -152,9 +151,8 @@ def tower_as_geojson(tower):
     for contact in tower.other_contacts:
         if contact.publish:
             c = {}
-            for  field in Contact._meta.get_fields():
-                if  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
-                    c[field.name] = getattr(contact, field.name)
+            for  name  in [f.name for f in Contact._meta.fields if f.name != 'tower']:
+                c[name] = getattr(contact, name)
             other_contacts.append(c)
     properties['other_contacts'] = other_contacts
 
@@ -162,9 +160,8 @@ def tower_as_geojson(tower):
     websites = []
     for website in tower.website_set.all():
         w = {}
-        for  field in Website._meta.get_fields():
-            if  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
-                w[field.name] = getattr(website, field.name)
+        for  name in [f.name for f in Website._meta.fields if f.name != 'tower']:
+            w[name] = getattr(website, name)
         websites.append(w)
     properties['websites'] = websites
 
@@ -172,18 +169,17 @@ def tower_as_geojson(tower):
     photos = []
     for photo in tower.photo_set.all():
         p = {}
-        for  field in Photo._meta.get_fields():
-            if isinstance(field, models.ImageField):
-                p[field.name] = getattr(photo, field.name).url
-            elif  isinstance(field, Field) and not isinstance(field, models.ForeignKey):
-                p[field.name] = getattr(photo, field.name)
+        for  name in [f.name for f in Photo._meta.fields if f.name != 'tower']:
+            if name == 'image':
+                p[name] = getattr(photo, name).url
+            else:
+                p[name] = getattr(photo, name)
         photos.append(p)
     properties['photos'] = photos
 
     return Feature(id=tower.id, geometry=point, properties=properties)
 
 
-@cache_page(None)
 def geojson(request, towerid=None, district=None):
 
     logger.info('Rebuilding the GeoJSONson page')
