@@ -5,6 +5,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.templatetags.static import static
 from django.urls import reverse
 from django.views.decorators.cache import cache_page
+from django.views.decorators.clickjacking import xframe_options_exempt
 from django.views.generic import TemplateView, ListView, DetailView
 
 from geojson import Point, Feature, FeatureCollection, dump
@@ -17,7 +18,12 @@ logger = logging.getLogger(__name__)
 
 # Create your views here.
 
-class TowerListView(ListView):
+class XFrameOptionsExemptMixin:
+    @xframe_options_exempt
+    def dispatch(self, *args, **kwargs):
+        return super().dispatch(*args, **kwargs)
+
+class TowerListView(XFrameOptionsExemptMixin, ListView):
     model = Tower
 
     def get_context_data(self, **kwargs):
@@ -25,7 +31,7 @@ class TowerListView(ListView):
         context["title"] = 'All towers'
         return context
 
-class DistrictListView(ListView):
+class DistrictListView(XFrameOptionsExemptMixin, ListView):
     model = Tower
     ordering = ('district', 'place', 'dedication')
 
@@ -36,7 +42,7 @@ class DistrictListView(ListView):
         return context
 
 
-class SingleDistrictListView(ListView):
+class SingleDistrictListView(XFrameOptionsExemptMixin, ListView):
 
     def get_queryset(self):
         district = self.kwargs["district"]
@@ -50,7 +56,7 @@ class SingleDistrictListView(ListView):
         return context
 
 
-class BellsListView(ListView):
+class BellsListView(XFrameOptionsExemptMixin, ListView):
     queryset = Tower.objects.exclude(ringing_status = 'N').exclude(bells=None)
     ordering = ('-bells', 'place', 'dedication')
 
@@ -61,7 +67,7 @@ class BellsListView(ListView):
         return context
 
 
-class UnBellsListView(ListView):
+class UnBellsListView(XFrameOptionsExemptMixin, ListView):
     queryset = Tower.objects.filter(ringing_status = 'N').exclude(bells=None)
     ordering = ('-bells', 'place', 'dedication')
 
@@ -74,7 +80,7 @@ class UnBellsListView(ListView):
         return context
 
 
-class PracticeNightListView(ListView):
+class PracticeNightListView(XFrameOptionsExemptMixin, ListView):
     queryset = Tower.objects.exclude(practice_day = '')
     ordering = ('practice_day', 'place', 'dedication')
     template_name = 'tower_database/practice_list.html'
@@ -85,7 +91,7 @@ class PracticeNightListView(ListView):
         return context
 
 
-class TowerDetailView(DetailView):
+class TowerDetailView(XFrameOptionsExemptMixin, DetailView):
     model = Tower
     context_object_name = 'tower'
 
@@ -101,7 +107,7 @@ class TowerDetailView(DetailView):
         return context
 
 
-class MapView(TemplateView):
+class MapView(XFrameOptionsExemptMixin, TemplateView):
     template_name = 'tower_database/map.html'
 
     def get_context_data(self, **kwargs):
