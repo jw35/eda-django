@@ -1,32 +1,29 @@
 <h2>Tower Database</h2>
 
+    <p>Things you can extract from the database:</p>
+
 	<ul>
 
 		<li><a href="{% url 'tower_list' %}">All towers</a>
-			(and as a <a href="{% url 'towers_map' %}">map</a>,
-		     and <a href="{% url 'towers_geojson' %}">machine-readable</a>)</li>
+			(and as a <a href="{% url 'towers_map' %}">map</a>)</li>
 
 		<li><a href="{% url 'district_list' %}">All towers, by District</a>
 			<ul>
 
 				<li><a href="{% url 'single_district_list' district='C' %}">Just Cambridge</a>
-					(and on a <a href="{% url 'district_map' district='C' %}">map</a>,
-				     and <a href="{% url 'district_geojson' district='C' %}">machine-readable</a>)
+					(and on a <a href="{% url 'district_map' district='C' %}">map</a>)
 				</li>
 
 				<li><a href="{% url 'single_district_list' district='E' %}">Just Ely</a>
-					(and on a <a href="{% url 'district_map' district='E' %}">map</a>,
-				     and <a href="{% url 'district_geojson' district='E' %}">machine-readable</a>)
+					(and on a <a href="{% url 'district_map' district='E' %}">map</a>)
 				</li>
 
 				<li><a href="{% url 'single_district_list' district='H' %}">Just Huntingdon</a>
-					(and on a <a href="{% url 'district_map' district='H' %}">map</a>,
-				     and <a href="{% url 'district_geojson' district='H' %}">machine-readable </a>)
+					(and on a <a href="{% url 'district_map' district='H' %}">map</a>)
 				</li>
 
 				<li><a href="{% url 'single_district_list' district='W' %}">Just Wisbech</a>
-					(and on a <a href="{% url 'district_map' district='W' %}">map</a>,
-					 and <a href="{% url 'district_geojson' district='W' %}">machine-readable</a>)
+					(and on a <a href="{% url 'district_map' district='W' %}">map</a>,)
 			    </li>
 
 			</ul>
@@ -34,4 +31,7 @@
 		<li><a href="{% url 'bells_list' %}">Towers rung full-circle, by number of bells</a></li>
 		<li><a href="{% url 'un_bells_list' %}">Towewrs not rung full-circle, by number of bells</a></li>
 		<li><a href="{% url 'practice_night_list' %}">Towers by practice night</a></li>
+		<li>CSV exports: <a href="{% url 'towers_csv' %}">Towers</a>, <a href="{% url 'contacts_csv' %}">Contacts</a>, <a href="{% url 'websites_csv' %}">Websites</a>, <a href="{% url 'photos_csv' %}">Photos</a></li>
+		<li><a href="https://en.wikipedia.org/wiki/GeoJSON">GeoJSON</a> exports: <a href="{% url 'towers_geojson' %}">all towers</a>, <a href="{% url 'district_geojson' district='C' %}">just Cambridge</a>, <a href="{% url 'district_geojson' district='E' %}">just Ely</a>, <a href="{% url 'district_geojson' district='H' %}">just Huntingdon</a>, <a href="{% url 'district_geojson' district='W' %}">just Wisbech</a>,</li>
 	</ul>
+

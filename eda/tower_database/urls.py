@@ -23,5 +23,9 @@ urlpatterns = [
     path(r'map/', view=views.MapView.as_view(), name='towers_map'),
     path(r'map/tower/<int:towerid>/', view=views.MapView.as_view(), name='tower_map'),
     path(r'map/district/<str:district>/', view=views.MapView.as_view(), name='district_map'),
+    path(r'csv/tower', view=views.tower_csv, name='towers_csv'),
+    path(r'csv/contact', view=views.contact_csv, name='contacts_csv'),
+    path(r'csv/website', view=views.website_csv, name='websites_csv'),
+    path(r'csv/photo', view=views.photo_csv, name='photos_csv'),
 
 ]

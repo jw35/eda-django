@@ -8,6 +8,7 @@ from django.views.decorators.cache import cache_page
 from django.views.generic import TemplateView, ListView, DetailView
 
 from geojson import Point, Feature, FeatureCollection, dump
+import csv
 
 from .models import Tower, Contact, Website, Photo
 
@@ -129,7 +130,7 @@ def tower_as_geojson(tower):
     point = Point((float(tower.lng), float(tower.lat)))
 
     properties = {}
-
+    
     # All (most) individual Tower fields
     for  field in Tower._meta.get_fields():
         if  isinstance(field, Field) and field.name not in ('id', 'latlng', 'maintainer_notes'):
@@ -211,3 +212,34 @@ def geojson(request, towerid=None, district=None):
 
     return response
 
+def as_csv(model, request, queryset=None):
+
+    response = HttpResponse(
+        content_type="text/csv",
+        headers={"Content-Disposition": f'attachment; filename="eda-{model.__name__}.csv"'},
+    )
+    writer = csv.writer(response)
+
+    fields = [f.name for f in model._meta.fields]
+    writer.writerow(fields)
+
+    if not queryset:
+        queryset = model.objects.all()
+
+    for row in queryset.values(*fields):
+        writer.writerow([row[field] for field in fields])
+
+    return response
+
+def tower_csv(response):
+    return as_csv(Tower, response)
+
+def contact_csv(response):
+    queryset = Contact.objects.filter(publish=True)
+    return as_csv(Contact, response, queryset)
+
+def website_csv(response):
+    return as_csv(Website, response)
+
+def photo_csv(response):
+    return as_csv(Photo, response)
