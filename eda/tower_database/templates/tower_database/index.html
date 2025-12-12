@@ -4,7 +4,8 @@
 
 	<ul>
 
-		<li><a href="{% url 'tower_list' %}">All towers</a>
+		<li>All towers <a href="{% url 'tower_list' %}">as a list</a>
+			or <a href="{% url 'tower_button_list' %}">as buttons</a>
 			(and as a <a href="{% url 'towers_map' %}">map</a>)</li>
 
 		<li><a href="{% url 'district_list' %}">All towers, by District</a>
@@ -36,7 +37,7 @@
 
 	<h3>Reusing this data</h3>
 
-	<p>This information is designed to be reused. All the pages above can be 'embedded' (by <i>iframe</i>) in other web sites (such as Google Sites ones) - see here for an <a href="https://www.elyda.org.uk/towers-and-bells/new-list">example on the Association Web Site</a>. The data can also be exported as Comma-Separated Values (CSV) which can be imported into spreadsheets for further analysis, and as <a href="https://en.wikipedia.org/wiki/GeoJSON">GeoJSON</a> which can be processed by Geographic Information Systems (GISs) and web mapping systems (this is how the maps above are created).</p>
+	<p>This information is designed to be reused. All the pages above can be 'embedded' (by <i>&lt;iframe&gt;</i>) in other web sites (such as Google Sites ones) - see here for an <a href="https://www.elyda.org.uk/towers-and-bells/new-list">example on the Association Web Site</a>. The data can also be exported as Comma-Separated Values (CSV) which can be imported into spreadsheets for further analysis, and as <a href="https://en.wikipedia.org/wiki/GeoJSON">GeoJSON</a> which can be processed by Geographic Information Systems (GISs) and web mapping systems (this is how the maps above are created).</p>
 
 	<ul>
 		<li>CSV exports: <a href="{% url 'towers_csv' %}">Towers</a>, <a href="{% url 'contacts_csv' %}">Contacts</a>, <a href="{% url 'websites_csv' %}">Websites</a>, <a href="{% url 'photos_csv' %}">Photos</a></li>

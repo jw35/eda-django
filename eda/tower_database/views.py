@@ -31,6 +31,9 @@ class TowerListView(XFrameOptionsExemptMixin, ListView):
         context["title"] = 'All towers'
         return context
 
+class TowerButtonListView(TowerListView):
+    template_name = 'tower_database/tower_list_buttons.html'
+
 class DistrictListView(XFrameOptionsExemptMixin, ListView):
     model = Tower
     ordering = ('district', 'place', 'dedication')

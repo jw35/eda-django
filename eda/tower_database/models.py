@@ -199,6 +199,17 @@ class Tower(CacheInvalidayingModel):
         return reverse("tower_detail", kwargs={"pk": self.pk})
 
     @property
+    def name(self):
+        return f'{self.place}{" - " + self.dedication if self.include_dedication else ""}'
+
+    @property
+    def short_name(self):
+        if self.place == "Cambridge":
+            return f'C{" - " + self.dedication if self.include_dedication else ""}'
+        else:
+            return f'{self.place}{" - " + self.dedication if self.include_dedication else ""}'
+
+    @property
     def practice_weeks_text(self):
         n = ''
         if 'not' in self.practice_weeks:

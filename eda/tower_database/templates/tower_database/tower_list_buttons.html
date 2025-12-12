@@ -1,0 +1,50 @@
+{% extends 'eda/base.html' %}
+
+{% load static %}
+
+{% block title %}{{ title }}{% endblock %}
+
+{{% block extra_js %}
+<script>
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]')
+    const tooltipList = [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl))
+</script>
+{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+
+    <div class="col-auto">
+
+<h1>{{ title }}</h1>
+
+<p>We believe our lists include all towers with 3 or more bells within the area of the Diocese of Ely (not all of which owned and maintained by the Diocese itself). This list can be searched, filtered and sorted.</p>
+
+{% if notes %}
+<p>{{ notes }}</p>
+{% endif %}
+
+<p>Each tower name is followed by the initial of its district (C, E, H or W), the number of bells and 'n' if there is no full-circle ringing (becasue the bells are unringable, hung for chiming only, tower unsafe, etc.)</p>
+
+{% regroup object_list by place.0 as tower_list %}
+
+<div class="container">
+
+{% for place in tower_list %}
+    <h1 class="my-5">{{ place.grouper }}</h1>
+    {% if place.grouper == 'C' %}
+    <p>Central Cambridge towers shown as 'C - church dedication'</p>
+    {% endif %}
+    <div class="text-center row gx-52 gy-5 row-cols-1 row-cols-sm-2 row-cols-lg-4">
+        {% for tower in place.list %}
+        <div class="col">
+          <div class="p-2 bg-dark text-white text-truncate" data-bs-toggle="tooltip" data-bs-title="{{ tower.short_name }} ({{ tower.district}}{{ tower.bells }}{% if tower.ringing_status == 'N' %}n{% endif %})"><a href="{% url 'tower_detail' pk=tower.pk %}" class="text-decoration-none link-light">{{ tower.short_name }} ({{ tower.district}}{{ tower.bells }}{% if tower.ringing_status == 'N' %}n{% endif %})</a></div>
+        </div>
+        {% endfor %}
+    </div>
+{% endfor %}
+
+</div>
+
+{% endblock %}
