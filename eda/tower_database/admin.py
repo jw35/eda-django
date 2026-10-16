@@ -108,7 +108,7 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
     list_filter = ["district", "report", "bells", "ringing_status", "ring_type", "practice_day"]
     search_fields = ["place", "dedication", "full_dedication", "nickname"]
     search_help_text = "Search by place or dedication"
-    readonly_fields = ["os_grid", "dove_link_html", "bellboard_link_html", "felstead_link_html"]
+    readonly_fields = ["os_grid", "edaid", "slug", "dove_link_html", "bellboard_link_html", "felstead_link_html"]
 
     def has_change_permission(self, request, obj=None):
         '''
@@ -177,12 +177,15 @@ class TowerAdmin(SearchAutoCompleteAdmin, SimpleHistoryAdmin):
                     "latlng",
                     "os_grid",
                     "postcode",
+                    "w3w",
                 )
             }
         ),
         (
             "Links and notes", {
                 "fields": (
+                    "edaid",
+                    "slug",
                     "dove_ringid",
                     "dove_towerid",
                     "dove_link_html",
