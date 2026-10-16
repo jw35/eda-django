@@ -8,7 +8,8 @@ function init_position_widget (widget_name, lat1, lng1, lat2, lng2, zoom, static
 
     var map = L.map(widget_name + '_map');
 
-    var osm = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+    var osm = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
+        referrerPolicy: 'strict-origin-when-cross-origin',
         attribution: 'Map data &copy; <a href="http://openstreetmap.org">OpenStreetMap</a>',
         maxZoom: 20,
         trackResize: true,
