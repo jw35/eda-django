@@ -176,6 +176,7 @@ class Tower(CacheInvalidayingModel):
     gf = models.BooleanField(blank=True, null=True, verbose_name="Ground Floor?")
     postcode = models.CharField(max_length=10, blank=True, validators=[postcode_validator])
     latlng = models.CharField(max_length=20, blank=True, verbose_name='Location')
+    w3w = models.CharField(max_length=64, blank=True, verbose_name='W3W location')
     peals = models.PositiveIntegerField(null=True , blank=True, help_text="Peals in most recent Annual Report")
     dove_towerid = models.CharField(max_length=10, blank=True, verbose_name="Dove TowerID")
     dove_ringid = models.CharField(max_length=10, blank=True, verbose_name="Dove RingID")
@@ -183,6 +184,8 @@ class Tower(CacheInvalidayingModel):
     notes = models.CharField(max_length=100, blank=True, help_text="For display, especially in the Annual Report")
     long_notes = models.TextField(blank=True, help_text="For display when space isn’t at a premium")
     maintainer_notes = models.TextField(blank=True)
+    edaid = models.CharField(max_length=4, blank=True, verbose_name="ElyDA ID")
+    slug = models.CharField(max_length=32, blank=True, verbose_name="ElyDA code")
     history = HistoricalRecords()
 
     class Meta:

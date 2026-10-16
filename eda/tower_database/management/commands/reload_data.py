@@ -27,12 +27,15 @@ easy_fields = (
     ('Weight', 'weight'),
     ('Note', 'note'),
     ('Postcode', 'postcode'),
+    ('W3W', 'w3w'),
     ('Dove Tower ID', 'dove_towerid'),
     ('Dove Ring ID', 'dove_ringid'),
     ('TowerBase ID', 'towerbase_id'),
     ('Notes', 'notes'),
     ('Longer notes', 'long_notes'),
     ('Maintainer notes', 'maintainer_notes'),
+    ('ID', 'edaid'),
+    ('Slug','slug'),
 )
 
 boolean_fields = (

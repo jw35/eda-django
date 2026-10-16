@@ -77,6 +77,10 @@
 		<td>{{ tower.os_grid }}</td>
 	</tr>
 	<tr>
+		<td class="fw-bold">What3Words</td>
+		<td><a href="https://what3words.com/{{ tower.w3w }}">///{{ tower.w3w }}</a></td>
+	</tr>
+	<tr>
 		<td class="fw-bold">Primary contact</td>
 		<td>
 	    {% if tower.primary_contact.publish %}
@@ -116,7 +120,11 @@
 	</tr>
 	<tr>
 		<td class="fw-bold">EDA Tower ID</td>
-		<td>{{ tower.pk }}</td>
+		<td>{{ tower.edaid }}</td>
+	</tr>
+	<tr>
+		<td class="fw-bold">EDA Tower code</td>
+		<td>{{ tower.slug }}</td>
 	</tr>
 	<tr>
 		<td class="fw-bold">EDA District</td>
