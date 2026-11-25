@@ -188,13 +188,13 @@ class Command(BaseCommand):
                         if name:
                             name = fake.last_name_male() if male else fake.last_name_female()
                         if phone1:
-                            phone1 = fake.phone_number()
+                            phone1 = '07700 900000'
                         if not random.randint(0,19):
-                            phone2 = fake.phone_number()
+                            phone2 = '0808 157 0000'
                         if email:
-                            email = fake.ascii_safe_email()
+                            email = 'no-such-address@example.com'
                         if not random.randint(0,19):
-                            form = fake.uri()
+                            form = 'https://example.com/contact-form'
                         reason = "Initial random data load"
 
                     contact = new_row.contact_set.create(
